@@ -1,0 +1,2 @@
+-- Paste nội dung room_rental_db.sql vào đây
+-- Hoặc để trống nếu dùng spring.jpa.hibernate.ddl-auto=update
