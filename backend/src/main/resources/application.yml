@@ -31,8 +31,10 @@ spring:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:ThisIsAVeryLongSecretKeyForJWTTokenGenerationRoomRental2026}
-    expiration-ms: 86400000   # 24 hours
+    # Secret phải là chuỗi Base64 encode của ít nhất 32 bytes (256 bit) để HMAC-SHA256 hoạt động.
+    # Giá trị mặc định dưới đây là Base64 của: "RoomRental@2026!SecretKey#ForJWT_HmacSHA256_MustBe32BytesOrMore"
+    secret: ${JWT_SECRET:Um9vbVJlbnRhbEAyMDI2IVNlY3JldEtleSNGb3JKV1RfSG1hY1NIQTI1Nl9NdXN0QmUzMkJ5dGVzT3JNb3Jl}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}   # 24 giờ (ms)
   frontend-url: ${FRONTEND_URL:http://localhost:3000}
   cors:
-    allowed-origins: ${CORS_ORIGINS:http://localhost:3000}
+    allowed-origins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:5173}

@@ -3,6 +3,8 @@ package com.roomrental.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -48,6 +50,24 @@ public class GlobalExceptionHandler {
         body.put("errors", errors);
         body.put("timestamp", LocalDateTime.now());
         return ResponseEntity.badRequest().body(body);
+    }
+
+    /**
+     * Sai username hoặc password khi gọi /api/auth/login → 401
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse(401, "Số điện thoại hoặc mật khẩu không đúng", LocalDateTime.now()));
+    }
+
+    /**
+     * Các lỗi xác thực khác từ Spring Security → 401
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthentication(AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse(401, "Xác thực thất bại: " + ex.getMessage(), LocalDateTime.now()));
     }
 
     @ExceptionHandler(Exception.class)

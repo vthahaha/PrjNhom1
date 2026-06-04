@@ -1,5 +1,6 @@
 package com.roomrental.config;
 
+import com.roomrental.security.JwtAuthEntryPoint;
 import com.roomrental.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,25 +27,41 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity   // bật @PreAuthorize / @PostAuthorize trên Controller
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
+    private final JwtAuthEntryPoint jwtAuthEntryPoint;
 
     @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
 
+    /**
+     * SecurityFilterChain – cấu hình chính:
+     * - Tắt CSRF (REST API stateless không cần)
+     * - Bật CORS
+     * - Session: STATELESS (dùng JWT)
+     * - Public endpoints: /api/auth/** và /api/public/**
+     * - Mọi request khác phải authenticated
+     * - Wire JwtAuthFilter trước UsernamePasswordAuthenticationFilter
+     * - Wire JwtAuthEntryPoint để trả JSON 401 thay vì redirect
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(jwtAuthEntryPoint)  // 401 → JSON
+                )
                 .authorizeHttpRequests(auth -> auth
+                        // ── Public APIs (không cần đăng nhập) ──────────────
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
+                        // ── Mọi request còn lại phải có JWT hợp lệ ─────────
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
@@ -52,6 +69,10 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * CORS – cho phép frontend gọi API.
+     * Giá trị allowed-origins đọc từ application.yml / biến môi trường.
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -64,13 +85,16 @@ public class SecurityConfig {
         return source;
     }
 
-@Bean
-public DaoAuthenticationProvider authenticationProvider() {
-    // Spring Security 7: UserDetailsService bắt buộc truyền qua constructor
-    DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-    provider.setPasswordEncoder(passwordEncoder());
-    return provider;
-}
+    /**
+     * DaoAuthenticationProvider – Spring Security 6/7:
+     * UserDetailsService truyền qua constructor (không dùng setter).
+     */
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
