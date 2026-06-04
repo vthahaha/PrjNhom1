@@ -61,6 +61,7 @@ public class SecurityConfig {
                         // ── Public APIs (không cần đăng nhập) ──────────────
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()  // Docker healthcheck
                         // ── Mọi request còn lại phải có JWT hợp lệ ─────────
                         .anyRequest().authenticated()
                 )

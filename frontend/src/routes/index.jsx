@@ -5,6 +5,7 @@ import AdminLayout from '../components/layout/AdminLayout'
 import TenantLayout from '../components/layout/TenantLayout'
 
 import LoginPage from '../pages/public/LoginPage'
+import RegisterPage from '../pages/public/RegisterPage'
 import ForgotPasswordPage from '../pages/public/ForgotPasswordPage'
 import PublicRoomsPage from '../pages/public/PublicRoomsPage'
 import FirstLoginPage from '../pages/public/FirstLoginPage'
@@ -34,6 +35,7 @@ function RequireAuth({ children, role }) {
 export const router = createBrowserRouter([
   // Public routes
   { path: '/login', element: <LoginPage /> },
+  { path: '/register', element: <RegisterPage /> },
   { path: '/forgot-password', element: <ForgotPasswordPage /> },
   { path: '/first-login', element: <FirstLoginPage /> },
   { path: '/phong-trong', element: <PublicRoomsPage /> },

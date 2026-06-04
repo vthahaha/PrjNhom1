@@ -38,3 +38,16 @@ app:
   frontend-url: ${FRONTEND_URL:http://localhost:3000}
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:5173}
+
+# Actuator – chỉ expose /actuator/health cho Docker healthcheck
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never   # ẩn chi tiết DB credential khỏi response
+  health:
+    mail:
+      enabled: false        # tắt mail health check (mail chưa cấu hình không nên làm app DOWN)

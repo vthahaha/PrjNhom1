@@ -3,6 +3,7 @@ import api from './axiosInstance'
 // ── AUTH ──────────────────────────────────────────────────
 export const authApi = {
   login: (data) => api.post('/auth/login', data),
+  register: (data) => api.post('/auth/register', data),
   logout: () => api.post('/auth/logout'),
   changePassword: (data) => api.post('/auth/change-password', data),
   forgotPassword: (email) => api.post(`/auth/forgot-password?email=${email}`),

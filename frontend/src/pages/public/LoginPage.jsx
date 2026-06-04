@@ -73,6 +73,13 @@ export default function LoginPage() {
               Đăng nhập
             </Button>
           </Form.Item>
+          
+          <div style={{ textAlign: 'center' }}>
+            <Text>Chưa có tài khoản? </Text>
+            <Button type="link" style={{ padding: 0 }} onClick={() => navigate('/register')}>
+              Đăng ký ngay
+            </Button>
+          </div>
         </Form>
       </Card>
     </div>

@@ -2,6 +2,7 @@ package com.roomrental.service.impl;
 
 import com.roomrental.dto.request.ChangePasswordRequest;
 import com.roomrental.dto.request.LoginRequest;
+import com.roomrental.dto.request.RegisterRequest;
 import com.roomrental.dto.response.AuthResponse;
 import com.roomrental.entity.User;
 import com.roomrental.exception.BadRequestException;
@@ -24,6 +25,25 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
+
+    @Override
+    @Transactional
+    public void register(RegisterRequest request) {
+        if (userRepository.findBySoDienThoai(request.soDienThoai()).isPresent()) {
+            throw new BadRequestException("Số điện thoại đã được đăng ký");
+        }
+        
+        User user = User.builder()
+                .hoTen(request.hoTen())
+                .soDienThoai(request.soDienThoai())
+                .email(request.email())
+                .matKhau(passwordEncoder.encode(request.matKhau()))
+                .vaiTro(User.VaiTro.TENANT)
+                .doiMkLanDau(false) // Tự đăng ký thì không bắt đổi mật khẩu nữa
+                .build();
+                
+        userRepository.save(user);
+    }
 
     @Override
     public AuthResponse login(LoginRequest request) {

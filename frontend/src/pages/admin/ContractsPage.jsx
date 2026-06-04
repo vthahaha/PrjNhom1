@@ -65,7 +65,13 @@ export default function ContractsPage() {
       render: (_, r) => r.trangThai === 'HIEU_LUC' && (
         <Button
           size="small" danger icon={<StopOutlined />}
-          onClick={() => terminateMutation.mutate({ id: r.id, data: { lyDo: 'Admin kết thúc' } })}
+          onClick={() => terminateMutation.mutate({ 
+            id: r.id, 
+            data: { 
+              lyDoChamDut: 'Admin kết thúc',
+              ngayTraPhong: dayjs().format('YYYY-MM-DD')
+            } 
+          })}
         >
           Kết thúc
         </Button>

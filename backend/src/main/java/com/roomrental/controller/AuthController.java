@@ -2,6 +2,7 @@ package com.roomrental.controller;
 
 import com.roomrental.dto.request.ChangePasswordRequest;
 import com.roomrental.dto.request.LoginRequest;
+import com.roomrental.dto.request.RegisterRequest;
 import com.roomrental.dto.response.AuthResponse;
 import com.roomrental.service.AuthService;
 import jakarta.validation.Valid;
@@ -21,6 +22,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) {
+        authService.register(request);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/logout")

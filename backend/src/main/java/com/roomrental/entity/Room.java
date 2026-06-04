@@ -33,6 +33,7 @@ public class Room {
     @Column(name = "gia_thue", nullable = false, precision = 12, scale = 0)
     private BigDecimal giaThue;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "trang_thai", nullable = false)
     private TrangThai trangThai = TrangThai.TRONG;

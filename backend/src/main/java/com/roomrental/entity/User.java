@@ -29,10 +29,12 @@ public class User {
     @Column(name = "mat_khau", nullable = false)
     private String matKhau;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "vai_tro", nullable = false)
     private VaiTro vaiTro = VaiTro.TENANT;
 
+    @Builder.Default
     @Column(name = "doi_mk_lan_dau", nullable = false)
     private boolean doiMkLanDau = true;
 
