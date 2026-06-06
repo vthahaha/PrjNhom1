@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -39,6 +40,9 @@ public class RepairRequest {
     @UpdateTimestamp
     @Column(name = "ngay_cap_nhat")
     private LocalDateTime ngayCapNhat;
+
+    @Column(name = "chi_phi", precision = 12, scale = 0)
+    private BigDecimal chiPhi = BigDecimal.ZERO;
 
     public enum TrangThai { CHO_XU_LY, DANG_XU_LY, HOAN_THANH }
 }

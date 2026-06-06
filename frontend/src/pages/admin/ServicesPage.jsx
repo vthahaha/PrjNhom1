@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Table, Button, Typography, Space, Modal, Form, Input, InputNumber, App, Popconfirm } from 'antd'
+import { Table, Button, Typography, Space, Modal, Form, Input, InputNumber, App, Popconfirm, Select } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { serviceApi } from '../../api'
+import { getColumnSearchProps } from '../../utils/tableUtils'
 
 const { Title } = Typography
 
@@ -44,8 +45,9 @@ export default function ServicesPage() {
   const onFinish = (v) => editing ? updateMutation.mutate({ id: editing.id, data: v }) : createMutation.mutate(v)
 
   const columns = [
-    { title: 'Tên dịch vụ', dataIndex: 'tenDichVu', key: 'tenDichVu' },
-    { title: 'Đơn giá (đ/tháng)', dataIndex: 'donGia', key: 'donGia', render: v => Number(v).toLocaleString('vi-VN') },
+    { title: 'Tên dịch vụ', dataIndex: 'tenDichVu', key: 'tenDichVu', ...getColumnSearchProps('tenDichVu', 'tên dịch vụ') },
+    { title: 'Đơn giá', dataIndex: 'donGiaMacDinh', key: 'donGiaMacDinh', render: v => `${Number(v).toLocaleString('vi-VN')} đ` },
+    { title: 'Đơn vị', dataIndex: 'donVi', key: 'donVi' },
     { title: 'Mô tả', dataIndex: 'moTa', key: 'moTa' },
     {
       title: 'Thao tác', key: 'action',
@@ -70,11 +72,18 @@ export default function ServicesPage() {
 
       <Modal title={editing ? 'Chỉnh sửa dịch vụ' : 'Thêm dịch vụ mới'} open={modalOpen} onCancel={closeModal} footer={null} destroyOnHidden>
         <Form form={form} layout="vertical" onFinish={onFinish} style={{ marginTop: 16 }}>
-          <Form.Item label="Tên dịch vụ" name="tenDichVu" rules={[{ required: true }]}><Input placeholder="VD: Internet, Gửi xe..." /></Form.Item>
-          <Form.Item label="Đơn giá (đ/tháng)" name="donGia" rules={[{ required: true }]}>
+          <Form.Item label="Tên dịch vụ" name="tenDichVu" rules={[{ required: true }]}><Input placeholder="VD: Internet, Gửi xe, Rác..." /></Form.Item>
+          <Form.Item label="Đơn giá" name="donGiaMacDinh" rules={[{ required: true }]}>
             <InputNumber style={{ width: '100%' }} min={0} step={10000} formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} />
           </Form.Item>
-          <Form.Item label="Mô tả" name="moTa"><Input.TextArea rows={2} /></Form.Item>
+          <Form.Item label="Đơn vị" name="donVi" rules={[{ required: true }]}>
+            <Select placeholder="Chọn đơn vị">
+              <Select.Option value="đ/phòng">đ/phòng (Cộng thẳng vào hóa đơn)</Select.Option>
+              <Select.Option value="đ/người">đ/người (Nhân với số người ở)</Select.Option>
+              <Select.Option value="đ/tháng">đ/tháng</Select.Option>
+              <Select.Option value="đ/lần">đ/lần</Select.Option>
+            </Select>
+          </Form.Item>
           <Form.Item style={{ textAlign: 'right', marginBottom: 0 }}>
             <Space>
               <Button onClick={closeModal}>Hủy</Button>

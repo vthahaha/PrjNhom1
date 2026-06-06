@@ -71,8 +71,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
+    public ResponseEntity<ErrorResponse> handleGeneral(Exception ex, jakarta.servlet.http.HttpServletRequest request) {
+        System.err.println("Error at URL: " + request.getMethod() + " " + request.getRequestURI());
+        ex.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse(500, "Lỗi hệ thống, vui lòng thử lại sau", LocalDateTime.now()));
+                .body(new ErrorResponse(500, "Lỗi hệ thống: " + ex.getMessage() + " tại " + request.getRequestURI(), LocalDateTime.now()));
     }
 }

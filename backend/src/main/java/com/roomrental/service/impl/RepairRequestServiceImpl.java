@@ -51,10 +51,15 @@ public class RepairRequestServiceImpl implements RepairRequestService {
 
     @Override
     @Transactional
-    public RepairRequestResponse updateStatus(Long id, RepairRequest.TrangThai trangThai) {
+    public RepairRequestResponse update(Long id, com.roomrental.dto.request.RepairRequestUpdate request) {
         RepairRequest rr = repairRequestRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Yêu cầu không tồn tại: " + id));
-        rr.setTrangThai(trangThai);
+        if (request.trangThai() != null) {
+            rr.setTrangThai(request.trangThai());
+        }
+        if (request.chiPhi() != null) {
+            rr.setChiPhi(request.chiPhi());
+        }
         return toResponse(repairRequestRepository.save(rr));
     }
 
@@ -77,6 +82,6 @@ public class RepairRequestServiceImpl implements RepairRequestService {
                 rr.getHopDong().getKhachThue().getId(),
                 rr.getHopDong().getKhachThue().getHoTen(),
                 rr.getMoTa(), rr.getAnhUrl(),
-                rr.getTrangThai(), rr.getNgayGui(), rr.getNgayCapNhat());
+                rr.getTrangThai(), rr.getNgayGui(), rr.getNgayCapNhat(), rr.getChiPhi());
     }
 }

@@ -8,13 +8,16 @@ import com.roomrental.entity.Invoice;
 import com.roomrental.entity.Room;
 import com.roomrental.repository.ContractRepository;
 import com.roomrental.repository.InvoiceRepository;
+import com.roomrental.repository.InvoiceRepository;
 import com.roomrental.repository.RoomRepository;
+import com.roomrental.repository.RepairRequestRepository;
 import com.roomrental.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +29,7 @@ public class DashboardServiceImpl implements DashboardService {
     private final RoomRepository roomRepository;
     private final ContractRepository contractRepository;
     private final InvoiceRepository invoiceRepository;
+    private final RepairRequestRepository repairRequestRepository;
 
     @Override
     public DashboardOverviewResponse getOverview() {
@@ -45,7 +49,7 @@ public class DashboardServiceImpl implements DashboardService {
         return invoiceRepository.revenueByMonth(year).stream()
                 .map(row -> new RevenueResponse(
                         ((Number) row[0]).intValue(),
-                        (BigDecimal) row[1]))
+                        new BigDecimal(row[1].toString())))
                 .toList();
     }
 
@@ -67,6 +71,23 @@ public class DashboardServiceImpl implements DashboardService {
         return result;
     }
 
+    @Override
+    public Map<String, BigDecimal> getFinanceStats(String startDate, String endDate) {
+        LocalDateTime start = startDate != null ? LocalDateTime.parse(startDate) : LocalDateTime.now().minusYears(10);
+        LocalDateTime end = endDate != null ? LocalDateTime.parse(endDate) : LocalDateTime.now().plusYears(10);
+        
+        Number tongThuRaw = invoiceRepository.sumPaidAmountByDateRange(start, end);
+        BigDecimal tongThu = tongThuRaw != null ? new BigDecimal(tongThuRaw.toString()) : BigDecimal.ZERO;
+        
+        Number tongChiRaw = repairRequestRepository.sumChiPhiByDateRange(start, end);
+        BigDecimal tongChi = tongChiRaw != null ? new BigDecimal(tongChiRaw.toString()) : BigDecimal.ZERO;
+        
+        Map<String, BigDecimal> result = new HashMap<>();
+        result.put("tongThu", tongThu);
+        result.put("tongChi", tongChi);
+        return result;
+    }
+
     // -------- helpers --------
 
     private ContractResponse toContractResponse(com.roomrental.entity.Contract c) {
@@ -76,7 +97,7 @@ public class DashboardServiceImpl implements DashboardService {
                 c.getKhachThue().getId(), c.getKhachThue().getHoTen(), c.getKhachThue().getSoDienThoai(),
                 c.getNgayBatDau(), c.getNgayKetThuc(),
                 c.getGiaThue(), c.getTienCoc(),
-                c.getTrangThai(), c.getLyDoChamDut(), c.getNgayTraPhong(),
+                c.getTrangThai(), c.getSoNguoiO(), c.getLyDoChamDut(), c.getNgayTraPhong(),
                 c.getCreatedAt());
     }
 }

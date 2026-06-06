@@ -13,4 +13,5 @@ public interface DashboardService {
     List<RevenueResponse> getRevenue(int year);
     List<ContractResponse> getExpiringContracts();
     Map<String, Object> getUnpaidInvoices();
+    Map<String, BigDecimal> getFinanceStats(String startDate, String endDate);
 }

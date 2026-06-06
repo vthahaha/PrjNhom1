@@ -145,7 +145,7 @@ public class TenantServiceImpl implements TenantService {
                 c.getKhachThue().getId(), c.getKhachThue().getHoTen(), c.getKhachThue().getSoDienThoai(),
                 c.getNgayBatDau(), c.getNgayKetThuc(),
                 c.getGiaThue(), c.getTienCoc(),
-                c.getTrangThai(), c.getLyDoChamDut(), c.getNgayTraPhong(),
+                c.getTrangThai(), c.getSoNguoiO(), c.getLyDoChamDut(), c.getNgayTraPhong(),
                 c.getCreatedAt());
     }
 }

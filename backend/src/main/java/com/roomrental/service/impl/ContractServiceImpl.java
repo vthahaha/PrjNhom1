@@ -60,6 +60,7 @@ public class ContractServiceImpl implements ContractService {
                 .ngayKetThuc(request.ngayKetThuc())
                 .giaThue(request.giaThue())
                 .tienCoc(request.tienCoc() != null ? request.tienCoc() : BigDecimal.ZERO)
+                .soNguoiO(request.soNguoiO() != null ? request.soNguoiO() : 1)
                 .trangThai(Contract.TrangThai.HIEU_LUC)
                 .build();
         room.setTrangThai(Room.TrangThai.DA_THUE);
@@ -138,7 +139,7 @@ public class ContractServiceImpl implements ContractService {
                 c.getKhachThue().getId(), c.getKhachThue().getHoTen(), c.getKhachThue().getSoDienThoai(),
                 c.getNgayBatDau(), c.getNgayKetThuc(),
                 c.getGiaThue(), c.getTienCoc(),
-                c.getTrangThai(), c.getLyDoChamDut(), c.getNgayTraPhong(),
+                c.getTrangThai(), c.getSoNguoiO(), c.getLyDoChamDut(), c.getNgayTraPhong(),
                 c.getCreatedAt());
     }
 }

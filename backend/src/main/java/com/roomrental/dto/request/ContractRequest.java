@@ -23,5 +23,8 @@ public record ContractRequest(
     @Positive(message = "Giá thuê phải lớn hơn 0")
     BigDecimal giaThue,
 
-    BigDecimal tienCoc
+    BigDecimal tienCoc,
+
+    @Positive(message = "Số người ở phải lớn hơn 0")
+    Integer soNguoiO
 ) {}

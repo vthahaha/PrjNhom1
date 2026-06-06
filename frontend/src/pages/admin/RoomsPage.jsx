@@ -6,6 +6,7 @@ import {
 import { PlusOutlined, SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { roomApi } from '../../api'
+import { getColumnSearchProps } from '../../utils/tableUtils'
 
 const { Title } = Typography
 const { Option } = Select
@@ -64,9 +65,15 @@ export default function RoomsPage() {
   }
 
   const columns = [
-    { title: 'Tên phòng', dataIndex: 'tenPhong', key: 'tenPhong', sorter: (a, b) => a.tenPhong.localeCompare(b.tenPhong) },
-    { title: 'Diện tích (m²)', dataIndex: 'dienTich', key: 'dienTich' },
-    { title: 'Số người tối đa', dataIndex: 'soNguoiToiDa', key: 'soNguoiToiDa' },
+    { 
+      title: 'Tên phòng', 
+      dataIndex: 'tenPhong', 
+      key: 'tenPhong', 
+      sorter: (a, b) => a.tenPhong.localeCompare(b.tenPhong),
+      ...getColumnSearchProps('tenPhong', 'tên phòng')
+    },
+    { title: 'Diện tích (m²)', dataIndex: 'dienTich', key: 'dienTich', sorter: (a, b) => a.dienTich - b.dienTich },
+    { title: 'Số người tối đa', dataIndex: 'soNguoiToiDa', key: 'soNguoiToiDa', render: (v) => v || 'Không giới hạn' },
     {
       title: 'Giá thuê',
       dataIndex: 'giaThue',
@@ -153,7 +160,7 @@ export default function RoomsPage() {
             <InputNumber style={{ width: '100%' }} min={0} step={0.5} />
           </Form.Item>
           <Form.Item label="Số người tối đa" name="soNguoiToiDa">
-            <InputNumber style={{ width: '100%' }} min={1} max={10} />
+            <InputNumber style={{ width: '100%' }} placeholder="Không giới hạn" />
           </Form.Item>
           <Form.Item label="Tiện nghi" name="tienNghi">
             <Input.TextArea rows={3} placeholder="Điều hòa, nóng lạnh, tủ lạnh..." />

@@ -1,8 +1,9 @@
-import { Table, Button, Tag, Typography, Space, Select, App, Popconfirm } from 'antd'
+import { Table, Button, Tag, Typography, Space, Select, App, Popconfirm, Input } from 'antd'
 import { CheckOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { invoiceApi } from '../../api'
+import { getColumnSearchProps } from '../../utils/tableUtils'
 
 const { Title } = Typography
 const { Option } = Select
@@ -23,9 +24,10 @@ export default function InvoicesPage() {
   })
 
   const columns = [
-    { title: 'Phòng', dataIndex: 'tenPhong', key: 'tenPhong' },
+    { title: 'Phòng', dataIndex: 'tenPhong', key: 'tenPhong', ...getColumnSearchProps('tenPhong', 'tên phòng') },
     { title: 'Tháng/Năm', key: 'kyHoaDon', render: (_, r) => `${r.thang}/${r.nam}` },
     { title: 'Tổng tiền', dataIndex: 'tongTien', key: 'tongTien', render: v => `${Number(v).toLocaleString('vi-VN')} đ` },
+    { title: 'Tiền/người', key: 'tienNguoi', render: (_, r) => `${Number(r.tongTien / (r.soNguoiO || 1)).toLocaleString('vi-VN')} đ` },
     {
       title: 'Trạng thái', dataIndex: 'trangThai', key: 'trangThai',
       render: v => <Tag color={v === 'DA_TT' ? 'green' : 'orange'}>{v === 'DA_TT' ? 'Đã thanh toán' : 'Chưa thanh toán'}</Tag>,

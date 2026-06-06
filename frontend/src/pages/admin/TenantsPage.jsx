@@ -4,6 +4,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { tenantApi } from '../../api'
+import { getColumnSearchProps } from '../../utils/tableUtils'
 
 const { Title } = Typography
 
@@ -45,8 +46,8 @@ export default function TenantsPage() {
   const onFinish = (v) => editing ? updateMutation.mutate({ id: editing.id, data: v }) : createMutation.mutate(v)
 
   const columns = [
-    { title: 'Họ tên', dataIndex: 'hoTen', key: 'hoTen' },
-    { title: 'Số điện thoại', dataIndex: 'soDienThoai', key: 'soDienThoai' },
+    { title: 'Họ tên', dataIndex: 'hoTen', key: 'hoTen', ...getColumnSearchProps('hoTen', 'họ tên') },
+    { title: 'Số điện thoại', dataIndex: 'soDienThoai', key: 'soDienThoai', ...getColumnSearchProps('soDienThoai', 'số điện thoại') },
     { title: 'Email', dataIndex: 'email', key: 'email' },
     { title: 'CCCD', dataIndex: 'cccd', key: 'cccd' },
     {

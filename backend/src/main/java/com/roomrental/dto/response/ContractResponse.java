@@ -18,6 +18,7 @@ public record ContractResponse(
     BigDecimal giaThue,
     BigDecimal tienCoc,
     Contract.TrangThai trangThai,
+    Integer soNguoiO,
     String lyDoChamDut,
     LocalDate ngayTraPhong,
     LocalDateTime createdAt

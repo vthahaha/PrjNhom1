@@ -4,6 +4,7 @@ import { PlusOutlined, StopOutlined, ReloadOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { contractApi, roomApi, tenantApi } from '../../api'
+import { getColumnSearchProps } from '../../utils/tableUtils'
 
 const { Title } = Typography
 const { Option } = Select
@@ -53,8 +54,8 @@ export default function ContractsPage() {
   })
 
   const columns = [
-    { title: 'Phòng', dataIndex: 'tenPhong', key: 'tenPhong' },
-    { title: 'Khách thuê', dataIndex: 'hoTen', key: 'hoTen' },
+    { title: 'Phòng', dataIndex: 'tenPhong', key: 'tenPhong', ...getColumnSearchProps('tenPhong', 'tên phòng') },
+    { title: 'Khách thuê', dataIndex: 'hoTen', key: 'hoTen', ...getColumnSearchProps('hoTen', 'khách thuê') },
     { title: 'Bắt đầu', dataIndex: 'ngayBatDau', key: 'ngayBatDau', render: v => dayjs(v).format('DD/MM/YYYY') },
     { title: 'Kết thúc', dataIndex: 'ngayKetThuc', key: 'ngayKetThuc', render: v => dayjs(v).format('DD/MM/YYYY') },
     { title: 'Giá thuê', dataIndex: 'giaThue', key: 'giaThue', render: v => `${Number(v).toLocaleString('vi-VN')} đ` },
@@ -113,6 +114,9 @@ export default function ContractsPage() {
           </Form.Item>
           <Form.Item label="Tiền cọc (đ)" name="tienCoc">
             <InputNumber style={{ width: '100%' }} min={0} step={100000} formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} />
+          </Form.Item>
+          <Form.Item label="Số người ở" name="soNguoiO" initialValue={1} rules={[{ required: true }]}>
+            <InputNumber style={{ width: '100%' }} min={1} />
           </Form.Item>
           <Form.Item style={{ textAlign: 'right', marginBottom: 0 }}>
             <Space>

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -41,5 +42,12 @@ public class DashboardController {
     @GetMapping("/unpaid-invoices")
     public ResponseEntity<Map<String, Object>> getUnpaidInvoices() {
         return ResponseEntity.ok(dashboardService.getUnpaidInvoices());
+    }
+
+    @GetMapping("/finance-stats")
+    public ResponseEntity<Map<String, BigDecimal>> getFinanceStats(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        return ResponseEntity.ok(dashboardService.getFinanceStats(startDate, endDate));
     }
 }

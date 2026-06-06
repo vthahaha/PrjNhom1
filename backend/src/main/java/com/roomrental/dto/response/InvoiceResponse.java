@@ -20,6 +20,7 @@ public record InvoiceResponse(
     BigDecimal phiKhac,
     String ghiChuPhiKhac,
     BigDecimal tongTien,
+    Integer soNguoiO,
     Invoice.TrangThai trangThai,
     LocalDateTime ngayThanhToan,
     LocalDateTime createdAt

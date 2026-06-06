@@ -10,6 +10,6 @@ import java.util.List;
 public interface RepairRequestService {
     RepairRequestResponse create(String soDienThoai, RepairRequestCreate request);
     List<RepairRequestResponse> getAll(Long phongId, LocalDateTime tuNgay, LocalDateTime denNgay);
-    RepairRequestResponse updateStatus(Long id, RepairRequest.TrangThai trangThai);
+    RepairRequestResponse update(Long id, com.roomrental.dto.request.RepairRequestUpdate request);
     List<RepairRequestResponse> getMyRequests(String soDienThoai);
 }

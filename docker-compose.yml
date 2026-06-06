@@ -34,7 +34,7 @@ services:
     environment:
       DB_USERNAME: ${DB_USERNAME:-appuser}
       DB_PASSWORD: ${DB_PASSWORD:-apppass}
-      JWT_SECRET: ${JWT_SECRET:-ThisIsAVeryLongSecretKeyForJWTTokenGenerationRoomRental2026}
+      JWT_SECRET: ${JWT_SECRET:-Um9vbVJlbnRhbEAyMDI2IVNlY3JldEtleSNGb3JKV1RfSG1hY1NIQTI1Nl9NdXN0QmUzMkJ5dGVzT3JNb3Jl}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost,http://localhost:3000}
       MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}

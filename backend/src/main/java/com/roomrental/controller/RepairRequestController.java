@@ -43,13 +43,13 @@ public class RepairRequestController {
         return ResponseEntity.ok(repairRequestService.getAll(phongId, tuNgay, denNgay));
     }
 
-    // ADMIN: cập nhật trạng thái
-    @PatchMapping("/api/repair-requests/{id}/status")
+    // ADMIN: cập nhật trạng thái và chi phí
+    @PatchMapping("/api/repair-requests/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<RepairRequestResponse> updateStatus(
+    public ResponseEntity<RepairRequestResponse> update(
             @PathVariable Long id,
-            @RequestParam RepairRequest.TrangThai trangThai) {
-        return ResponseEntity.ok(repairRequestService.updateStatus(id, trangThai));
+            @RequestBody com.roomrental.dto.request.RepairRequestUpdate request) {
+        return ResponseEntity.ok(repairRequestService.update(id, request));
     }
 
     // TENANT: xem yêu cầu của mình

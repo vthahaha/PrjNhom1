@@ -10,8 +10,10 @@ import com.roomrental.exception.BadRequestException;
 import com.roomrental.exception.ResourceNotFoundException;
 import com.roomrental.repository.ContractRepository;
 import com.roomrental.repository.InvoiceRepository;
+import com.roomrental.repository.RoomServiceRepository;
 import com.roomrental.repository.UserRepository;
 import com.roomrental.repository.UtilityPriceRepository;
+import com.roomrental.entity.RoomService;
 import com.roomrental.service.InvoiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final ContractRepository contractRepository;
     private final UtilityPriceRepository utilityPriceRepository;
     private final UserRepository userRepository;
+    private final RoomServiceRepository roomServiceRepository;
 
     @Override
     public List<InvoiceResponse> getAll(Integer thang, Integer nam, Long phongId, Invoice.TrangThai trangThai) {
@@ -68,8 +71,20 @@ public class InvoiceServiceImpl implements InvoiceService {
             tienNuoc = tieuThuNuoc.multiply(utilityPrice.getDonGiaNuoc());
         }
 
+        BigDecimal tienDichVuThem = BigDecimal.ZERO;
+        List<RoomService> services = roomServiceRepository.findByRoomId(contract.getRoom().getId());
+        for (RoomService rs : services) {
+            BigDecimal price = rs.getDonGiaOverride() != null ? rs.getDonGiaOverride() : rs.getService().getDonGiaMacDinh();
+            String donVi = rs.getService().getDonVi();
+            if (donVi != null && donVi.toLowerCase().contains("người")) {
+                tienDichVuThem = tienDichVuThem.add(price.multiply(BigDecimal.valueOf(contract.getSoNguoiO())));
+            } else {
+                tienDichVuThem = tienDichVuThem.add(price);
+            }
+        }
+
         BigDecimal tongTien = contract.getGiaThue()
-                .add(tienDien).add(tienNuoc).add(phiKhac);
+                .add(tienDien).add(tienNuoc).add(tienDichVuThem).add(phiKhac);
 
         Invoice invoice = Invoice.builder()
                 .hopDong(contract)
@@ -136,7 +151,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 i.getChiSoDienDau(), i.getChiSoDienCuoi(),
                 i.getChiSoNuocDau(), i.getChiSoNuocCuoi(),
                 i.getPhiKhac(), i.getGhiChuPhiKhac(),
-                i.getTongTien(), i.getTrangThai(),
+                i.getTongTien(), i.getHopDong().getSoNguoiO(), i.getTrangThai(),
                 i.getNgayThanhToan(), i.getCreatedAt());
     }
 }

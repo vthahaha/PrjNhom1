@@ -46,7 +46,7 @@ export const contractApi = {
   terminate: (id, data) => api.patch(`/contracts/${id}/terminate`, data),
   renew: (id, data) => api.patch(`/contracts/${id}/renew`, data),
   getExpiringSoon: () => api.get('/contracts/expiring-soon'),
-  getMyContract: () => api.get('/me/contract'),
+  getMyContract: () => api.get('/contracts/me'),
 }
 
 // ── INVOICES ──────────────────────────────────────────────
@@ -72,8 +72,7 @@ export const serviceApi = {
 export const repairApi = {
   getAll: (params) => api.get('/repair-requests', { params }),
   create: (data) => api.post('/repair-requests', data),
-  updateStatus: (id, trangThai) =>
-    api.patch(`/repair-requests/${id}/status`, null, { params: { trangThai } }),
+  update: (id, data) => api.patch(`/repair-requests/${id}`, data),
   getMine: () => api.get('/me/repair-requests'),
 }
 
@@ -83,6 +82,7 @@ export const dashboardApi = {
   getRevenue: (year) => api.get('/dashboard/revenue', { params: { year } }),
   getExpiringContracts: () => api.get('/dashboard/expiring-contracts'),
   getUnpaidInvoices: () => api.get('/dashboard/unpaid-invoices'),
+  getFinanceStats: (params) => api.get('/dashboard/finance-stats', { params }),
 }
 
 // ── PUBLIC ────────────────────────────────────────────────

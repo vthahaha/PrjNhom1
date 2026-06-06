@@ -43,6 +43,9 @@ public class Contract {
     @Column(name = "trang_thai", nullable = false)
     private TrangThai trangThai = TrangThai.HIEU_LUC;
 
+    @Column(name = "so_nguoi_o", nullable = false)
+    private Integer soNguoiO = 1;
+
     @Column(name = "ly_do_cham_dut", columnDefinition = "TEXT")
     private String lyDoChamDut;
 

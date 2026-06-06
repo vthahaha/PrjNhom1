@@ -2,6 +2,7 @@ package com.roomrental.dto.response;
 
 import com.roomrental.entity.RepairRequest;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record RepairRequestResponse(
@@ -15,5 +16,6 @@ public record RepairRequestResponse(
     String anhUrl,
     RepairRequest.TrangThai trangThai,
     LocalDateTime ngayGui,
-    LocalDateTime ngayCapNhat
+    LocalDateTime ngayCapNhat,
+    BigDecimal chiPhi
 ) {}
