@@ -45,6 +45,7 @@ export default function ServicesPage() {
   const onFinish = (v) => editing ? updateMutation.mutate({ id: editing.id, data: v }) : createMutation.mutate(v)
 
   const columns = [
+    { title: 'STT', key: 'stt', width: 60, align: 'center', render: (_, __, index) => index + 1 },
     { title: 'Tên dịch vụ', dataIndex: 'tenDichVu', key: 'tenDichVu', ...getColumnSearchProps('tenDichVu', 'tên dịch vụ') },
     { title: 'Đơn giá', dataIndex: 'donGiaMacDinh', key: 'donGiaMacDinh', render: v => `${Number(v).toLocaleString('vi-VN')} đ` },
     { title: 'Đơn vị', dataIndex: 'donVi', key: 'donVi' },

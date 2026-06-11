@@ -15,5 +15,8 @@ public record TenantRequest(
     String soDienThoai,
 
     @Email(message = "Email không hợp lệ")
-    String email
+    String email,
+    
+    String cccd,
+    String queQuan
 ) {}

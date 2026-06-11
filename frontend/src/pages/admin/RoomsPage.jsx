@@ -17,6 +17,11 @@ const trangThaiConfig = {
   DANG_SUA: { color: 'orange', label: 'Đang sửa'  },
 }
 
+const COMMON_FACILITIES = [
+  'Điều hòa', 'Máy giặt', 'Tủ lạnh', 'Bếp', 'Giường', 
+  'Tủ quần áo', 'Nóng lạnh', 'Internet'
+]
+
 export default function RoomsPage() {
   const [search, setSearch] = useState('')
   const [trangThai, setTrangThai] = useState(undefined)
@@ -54,17 +59,25 @@ export default function RoomsPage() {
   const openCreate = () => { setEditingRoom(null); form.resetFields(); setModalOpen(true) }
   const openEdit = (room) => {
     setEditingRoom(room)
-    form.setFieldsValue(room)
+    form.setFieldsValue({
+      ...room,
+      tienNghi: room.tienNghi ? room.tienNghi.split(', ') : []
+    })
     setModalOpen(true)
   }
   const closeModal = () => { setModalOpen(false); setEditingRoom(null); form.resetFields() }
 
   const onFinish = (values) => {
-    if (editingRoom) updateMutation.mutate({ id: editingRoom.id, data: values })
-    else createMutation.mutate(values)
+    const data = {
+      ...values,
+      tienNghi: Array.isArray(values.tienNghi) ? values.tienNghi.join(', ') : values.tienNghi
+    }
+    if (editingRoom) updateMutation.mutate({ id: editingRoom.id, data })
+    else createMutation.mutate(data)
   }
 
   const columns = [
+    { title: 'STT', key: 'stt', width: 60, align: 'center', render: (_, __, index) => index + 1 },
     { 
       title: 'Tên phòng', 
       dataIndex: 'tenPhong', 
@@ -163,7 +176,11 @@ export default function RoomsPage() {
             <InputNumber style={{ width: '100%' }} placeholder="Không giới hạn" />
           </Form.Item>
           <Form.Item label="Tiện nghi" name="tienNghi">
-            <Input.TextArea rows={3} placeholder="Điều hòa, nóng lạnh, tủ lạnh..." />
+            <Select 
+              mode="tags" 
+              placeholder="Chọn hoặc nhập tiện nghi (VD: Điều hòa, Máy giặt...)"
+              options={COMMON_FACILITIES.map(f => ({ label: f, value: f }))}
+            />
           </Form.Item>
           <Form.Item style={{ textAlign: 'right', marginBottom: 0 }}>
             <Space>

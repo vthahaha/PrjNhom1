@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Table, Button, Tag, Typography, Modal, Form, Input, App, Space } from 'antd'
+import { Table, Button, Tag, Typography, Modal, Form, Input, App, Space, Checkbox } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { repairApi } from '../../api'
+import { repairApi, contractApi } from '../../api'
 
 const { Title } = Typography
 
@@ -24,6 +24,14 @@ export default function MyRepairRequestsPage() {
     queryFn: () => repairApi.getMine().then(r => r.data),
   })
 
+  const { data: myContract } = useQuery({
+    queryKey: ['my-contract'],
+    queryFn: () => contractApi.getMyContract().then(r => r.data),
+    retry: false
+  })
+
+  const roomFacilities = myContract?.tienNghi ? myContract.tienNghi.split(', ') : []
+
   const createMutation = useMutation({
     mutationFn: repairApi.create,
     onSuccess: () => {
@@ -35,7 +43,12 @@ export default function MyRepairRequestsPage() {
   })
 
   const columns = [
+    { title: 'STT', key: 'stt', width: 60, align: 'center', render: (_, __, index) => index + 1 },
     { title: 'Mô tả', dataIndex: 'moTa', key: 'moTa', ellipsis: true },
+    {
+      title: 'CSVC hỏng', dataIndex: 'csvcHieuHong', key: 'csvcHieuHong',
+      render: v => v ? <Space size={[0, 4]} wrap>{v.split(', ').map(i => <Tag key={i} color="red">{i}</Tag>)}</Space> : '—'
+    },
     { title: 'Ngày gửi', dataIndex: 'ngayGui', key: 'ngayGui', render: v => dayjs(v).format('DD/MM/YYYY HH:mm') },
     {
       title: 'Trạng thái', dataIndex: 'trangThai', key: 'trangThai',
@@ -53,7 +66,27 @@ export default function MyRepairRequestsPage() {
 
       <Modal title="Gửi yêu cầu sửa chữa" open={modalOpen} onCancel={() => { setModalOpen(false); form.resetFields() }} footer={null} destroyOnHidden>
         <Form form={form} layout="vertical" onFinish={(v) => createMutation.mutate(v)} style={{ marginTop: 16 }}>
-          <Form.Item label="Mô tả sự cố" name="moTa" rules={[{ required: true, message: 'Vui lòng mô tả sự cố' }]}>
+          {roomFacilities.length > 0 && (
+            <Form.Item label="Chọn Cơ sở vật chất hỏng" name="csvcHieuHong">
+              <Checkbox.Group options={roomFacilities} />
+            </Form.Item>
+          )}
+          <Form.Item 
+            label="Mô tả sự cố" 
+            name="moTa"
+            dependencies={['csvcHieuHong']}
+            rules={[
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const csvc = getFieldValue('csvcHieuHong')
+                  if (!value && (!csvc || csvc.length === 0)) {
+                    return Promise.reject(new Error('Vui lòng chọn cơ sở vật chất hoặc nhập mô tả'))
+                  }
+                  return Promise.resolve()
+                }
+              })
+            ]}
+          >
             <Input.TextArea rows={4} placeholder="Mô tả chi tiết vấn đề cần sửa chữa..." />
           </Form.Item>
           <Form.Item label="Đường dẫn ảnh (tùy chọn)" name="anhUrl">

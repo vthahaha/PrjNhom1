@@ -52,6 +52,9 @@ public class Contract {
     @Column(name = "ngay_tra_phong")
     private LocalDate ngayTraPhong;
 
+    @Column(name = "file_hop_dong_url")
+    private String fileHopDongUrl;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

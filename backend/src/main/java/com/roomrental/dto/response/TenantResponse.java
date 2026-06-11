@@ -12,5 +12,7 @@ public record TenantResponse(
     User.VaiTro vaiTro,
     boolean doiMkLanDau,
     LocalDateTime createdAt,
-    boolean coHopDongHieuLuc   // trạng thái hợp đồng hiện tại
+    boolean coHopDongHieuLuc,
+    String cccd,
+    String queQuan
 ) {}

@@ -47,6 +47,10 @@ export const contractApi = {
   renew: (id, data) => api.patch(`/contracts/${id}/renew`, data),
   getExpiringSoon: () => api.get('/contracts/expiring-soon'),
   getMyContract: () => api.get('/contracts/me'),
+  uploadDocument: (id, formData) => api.post(`/contracts/${id}/upload-document`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  deleteDocument: (id) => api.delete(`/contracts/${id}/upload-document`),
 }
 
 // ── INVOICES ──────────────────────────────────────────────

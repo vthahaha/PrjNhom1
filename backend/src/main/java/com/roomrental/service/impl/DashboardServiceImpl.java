@@ -8,10 +8,10 @@ import com.roomrental.entity.Invoice;
 import com.roomrental.entity.Room;
 import com.roomrental.repository.ContractRepository;
 import com.roomrental.repository.InvoiceRepository;
-import com.roomrental.repository.InvoiceRepository;
 import com.roomrental.repository.RoomRepository;
 import com.roomrental.repository.RepairRequestRepository;
 import com.roomrental.service.DashboardService;
+import com.roomrental.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +30,7 @@ public class DashboardServiceImpl implements DashboardService {
     private final ContractRepository contractRepository;
     private final InvoiceRepository invoiceRepository;
     private final RepairRequestRepository repairRequestRepository;
+    private final FileStorageService fileStorageService;
 
     @Override
     public DashboardOverviewResponse getOverview() {
@@ -98,6 +99,6 @@ public class DashboardServiceImpl implements DashboardService {
                 c.getNgayBatDau(), c.getNgayKetThuc(),
                 c.getGiaThue(), c.getTienCoc(),
                 c.getTrangThai(), c.getSoNguoiO(), c.getLyDoChamDut(), c.getNgayTraPhong(),
-                c.getCreatedAt());
+                c.getCreatedAt(), c.getRoom().getTienNghi(), fileStorageService.getPresignedUrl(c.getFileHopDongUrl()));
     }
 }

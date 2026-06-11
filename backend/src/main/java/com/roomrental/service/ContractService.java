@@ -16,4 +16,7 @@ public interface ContractService {
     ContractResponse renew(Long id, ContractRenewRequest request);
     List<ContractResponse> getExpiringSoon();
     ContractResponse getMyContract(String soDienThoai);
+    ContractResponse uploadDocument(Long id, org.springframework.web.multipart.MultipartFile file);
+
+    ContractResponse deleteDocument(Long id);
 }

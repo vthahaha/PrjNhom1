@@ -28,9 +28,23 @@ export default function App() {
         locale={viVN}
         theme={{
           token: {
-            colorPrimary: '#1677ff',
-            borderRadius: 8,
+            colorPrimary: '#8b5cf6',
+            colorInfo: '#8b5cf6',
+            colorSuccess: '#10b981',
+            colorWarning: '#f59e0b',
+            colorError: '#ef4444',
+            borderRadius: 12,
+            fontFamily: "'Outfit', sans-serif",
+            colorBgContainer: '#ffffff',
           },
+          components: {
+            Button: {
+              controlHeight: 38,
+            },
+            Card: {
+              boxShadowTertiary: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            }
+          }
         }}
       >
         <AntApp>

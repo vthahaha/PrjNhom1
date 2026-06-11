@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Table, Button, Tag, Typography, Space, Modal, Form, Select, DatePicker, InputNumber, App } from 'antd'
-import { PlusOutlined, StopOutlined, ReloadOutlined } from '@ant-design/icons'
+import { Table, Button, Tag, Typography, Space, Modal, Form, Select, DatePicker, InputNumber, App, Upload } from 'antd'
+import { PlusOutlined, StopOutlined, ReloadOutlined, UploadOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { contractApi, roomApi, tenantApi } from '../../api'
@@ -53,14 +53,44 @@ export default function ContractsPage() {
     onError: (e) => message.error(e.response?.data?.message || 'Lỗi'),
   })
 
+  const uploadMutation = useMutation({
+    mutationFn: ({ id, file }) => {
+      const formData = new FormData()
+      formData.append('file', file)
+      return contractApi.uploadDocument(id, formData)
+    },
+    onSuccess: () => { message.success('Tải file lên thành công'); qc.invalidateQueries({ queryKey: ['contracts'] }) },
+    onError: (e) => message.error(e.response?.data?.message || 'Lỗi khi tải file'),
+  })
+
+  const deleteDocumentMutation = useMutation({
+    mutationFn: (id) => contractApi.deleteDocument(id),
+    onSuccess: () => { message.success('Xóa file thành công'); qc.invalidateQueries({ queryKey: ['contracts'] }) },
+    onError: (e) => message.error(e.response?.data?.message || 'Lỗi khi xóa file'),
+  })
+
   const columns = [
+    { title: 'STT', key: 'stt', width: 60, align: 'center', render: (_, __, index) => index + 1 },
     { title: 'Phòng', dataIndex: 'tenPhong', key: 'tenPhong', ...getColumnSearchProps('tenPhong', 'tên phòng') },
-    { title: 'Khách thuê', dataIndex: 'hoTen', key: 'hoTen', ...getColumnSearchProps('hoTen', 'khách thuê') },
+    { title: 'Khách thuê', dataIndex: 'hoTenKhach', key: 'hoTenKhach', ...getColumnSearchProps('hoTenKhach', 'khách thuê') },
     { title: 'Bắt đầu', dataIndex: 'ngayBatDau', key: 'ngayBatDau', render: v => dayjs(v).format('DD/MM/YYYY') },
     { title: 'Kết thúc', dataIndex: 'ngayKetThuc', key: 'ngayKetThuc', render: v => dayjs(v).format('DD/MM/YYYY') },
     { title: 'Giá thuê', dataIndex: 'giaThue', key: 'giaThue', render: v => `${Number(v).toLocaleString('vi-VN')} đ` },
     { title: 'Trạng thái', dataIndex: 'trangThai', key: 'trangThai',
       render: v => <Tag color={trangThaiConfig[v]?.color}>{trangThaiConfig[v]?.label}</Tag> },
+    {
+      title: 'File Hợp đồng', key: 'fileHopDong',
+      render: (_, r) => r.fileHopDongUrl ? (
+        <Space size={0} split={<span style={{color: '#ccc'}}>|</span>}>
+          <Button type="link" href={r.fileHopDongUrl} target="_blank">Xem / Tải về</Button>
+          <Button type="link" danger onClick={() => Modal.confirm({ title: 'Xóa file hợp đồng?', onOk: () => deleteDocumentMutation.mutate(r.id) })} loading={deleteDocumentMutation.isPending}>Xóa</Button>
+        </Space>
+      ) : (
+        <Upload showUploadList={false} beforeUpload={(file) => { uploadMutation.mutate({ id: r.id, file }); return false; }} accept=".pdf,.docx,.png,.jpg,.jpeg">
+          <Button size="small" icon={<UploadOutlined />} loading={uploadMutation.isPending}>Tải lên</Button>
+        </Upload>
+      )
+    },
     {
       title: 'Thao tác', key: 'action',
       render: (_, r) => r.trangThai === 'HIEU_LUC' && (

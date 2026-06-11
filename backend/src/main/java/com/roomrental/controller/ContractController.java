@@ -59,6 +59,20 @@ public class ContractController {
         return ResponseEntity.ok(contractService.renew(id, request));
     }
 
+    @PostMapping("/{id}/upload-document")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ContractResponse> uploadDocument(
+            @PathVariable Long id,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        return ResponseEntity.ok(contractService.uploadDocument(id, file));
+    }
+
+    @DeleteMapping("/{id}/upload-document")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ContractResponse> deleteDocument(@PathVariable Long id) {
+        return ResponseEntity.ok(contractService.deleteDocument(id));
+    }
+
     @GetMapping("/expiring-soon")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ContractResponse>> getExpiringSoon() {

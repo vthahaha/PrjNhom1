@@ -46,6 +46,7 @@ export default function TenantsPage() {
   const onFinish = (v) => editing ? updateMutation.mutate({ id: editing.id, data: v }) : createMutation.mutate(v)
 
   const columns = [
+    { title: 'STT', key: 'stt', width: 60, align: 'center', render: (_, __, index) => index + 1 },
     { title: 'Họ tên', dataIndex: 'hoTen', key: 'hoTen', ...getColumnSearchProps('hoTen', 'họ tên') },
     { title: 'Số điện thoại', dataIndex: 'soDienThoai', key: 'soDienThoai', ...getColumnSearchProps('soDienThoai', 'số điện thoại') },
     { title: 'Email', dataIndex: 'email', key: 'email' },

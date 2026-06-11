@@ -21,5 +21,7 @@ public record ContractResponse(
     Integer soNguoiO,
     String lyDoChamDut,
     LocalDate ngayTraPhong,
-    LocalDateTime createdAt
+    LocalDateTime createdAt,
+    String tienNghi,
+    String fileHopDongUrl
 ) {}

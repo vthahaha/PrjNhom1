@@ -2,6 +2,7 @@ import { Card, Descriptions, Tag, Typography, Spin, Empty } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { contractApi } from '../../api'
+import qrImage from '../../img/download.jpg'
 
 const { Title } = Typography
 
@@ -36,6 +37,16 @@ export default function MyContractPage() {
           <Descriptions.Item label="Ngày kết thúc">{dayjs(data.ngayKetThuc).format('DD/MM/YYYY')}</Descriptions.Item>
           <Descriptions.Item label="Giá thuê">{Number(data.giaThue).toLocaleString('vi-VN')} đ/tháng</Descriptions.Item>
           <Descriptions.Item label="Tiền cọc">{Number(data.tienCoc).toLocaleString('vi-VN')} đ</Descriptions.Item>
+          <Descriptions.Item label="File hợp đồng" span={2}>
+            {data.fileHopDongUrl ? (
+              <a href={data.fileHopDongUrl} target="_blank" rel="noopener noreferrer">Xem / Tải về bản cứng</a>
+            ) : (
+              <span style={{ color: 'gray' }}>Chưa có file</span>
+            )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Mã QR Thanh Toán" span={2}>
+            <img src={qrImage} alt="QR Code" style={{ width: 150, height: 150, objectFit: 'contain', border: '1px solid #d9d9d9', borderRadius: 8, padding: 4 }} />
+          </Descriptions.Item>
         </Descriptions>
       </Card>
     </div>

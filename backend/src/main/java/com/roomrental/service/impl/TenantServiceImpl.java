@@ -10,6 +10,7 @@ import com.roomrental.exception.BadRequestException;
 import com.roomrental.exception.ResourceNotFoundException;
 import com.roomrental.repository.ContractRepository;
 import com.roomrental.repository.UserRepository;
+import com.roomrental.service.FileStorageService;
 import com.roomrental.service.TenantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +26,7 @@ public class TenantServiceImpl implements TenantService {
     private final UserRepository userRepository;
     private final ContractRepository contractRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FileStorageService fileStorageService;
 
     @Override
     public List<TenantResponse> getAll() {
@@ -50,6 +52,8 @@ public class TenantServiceImpl implements TenantService {
                 .matKhau(passwordEncoder.encode(tmpPassword))
                 .vaiTro(User.VaiTro.TENANT)
                 .doiMkLanDau(true)
+                .cccd(request.cccd())
+                .queQuan(request.queQuan())
                 .build();
         // TODO: gửi thông tin đăng nhập qua email (MailService)
         return toResponse(userRepository.save(user));
@@ -74,6 +78,8 @@ public class TenantServiceImpl implements TenantService {
         user.setHoTen(request.hoTen());
         user.setSoDienThoai(request.soDienThoai());
         user.setEmail(request.email());
+        user.setCccd(request.cccd());
+        user.setQueQuan(request.queQuan());
         return toResponse(userRepository.save(user));
     }
 
@@ -110,6 +116,8 @@ public class TenantServiceImpl implements TenantService {
                 .orElseThrow(() -> new ResourceNotFoundException("Người dùng không tồn tại"));
         if (request.hoTen() != null) user.setHoTen(request.hoTen());
         if (request.email() != null) user.setEmail(request.email());
+        if (request.cccd() != null) user.setCccd(request.cccd());
+        if (request.queQuan() != null) user.setQueQuan(request.queQuan());
         if (request.soDienThoai() != null && !request.soDienThoai().equals(soDienThoai)) {
             if (userRepository.existsBySoDienThoai(request.soDienThoai())) {
                 throw new BadRequestException("Số điện thoại đã tồn tại");
@@ -135,7 +143,7 @@ public class TenantServiceImpl implements TenantService {
                 user.getId(), Contract.TrangThai.HIEU_LUC);
         return new TenantResponse(user.getId(), user.getHoTen(), user.getSoDienThoai(),
                 user.getEmail(), user.getVaiTro(), user.isDoiMkLanDau(),
-                user.getCreatedAt(), coHopDong);
+                user.getCreatedAt(), coHopDong, user.getCccd(), user.getQueQuan());
     }
 
     private ContractResponse toContractResponse(Contract c) {
@@ -146,6 +154,6 @@ public class TenantServiceImpl implements TenantService {
                 c.getNgayBatDau(), c.getNgayKetThuc(),
                 c.getGiaThue(), c.getTienCoc(),
                 c.getTrangThai(), c.getSoNguoiO(), c.getLyDoChamDut(), c.getNgayTraPhong(),
-                c.getCreatedAt());
+                c.getCreatedAt(), c.getRoom().getTienNghi(), fileStorageService.getPresignedUrl(c.getFileHopDongUrl()));
     }
 }

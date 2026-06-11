@@ -29,6 +29,12 @@ public class User {
     @Column(name = "mat_khau", nullable = false)
     private String matKhau;
 
+    @Column(name = "cccd", length = 20)
+    private String cccd;
+
+    @Column(name = "que_quan")
+    private String queQuan;
+
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "vai_tro", nullable = false)

@@ -12,10 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 
-/**
- * Xử lý lỗi 401 Unauthorized khi request không có JWT hoặc JWT không hợp lệ.
- * Trả về JSON thay vì redirect về trang login (vì đây là REST API stateless).
- */
+
 @Component
 @Slf4j
 public class JwtAuthEntryPoint implements AuthenticationEntryPoint {

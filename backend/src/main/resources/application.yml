@@ -38,6 +38,14 @@ app:
   frontend-url: ${FRONTEND_URL:http://localhost:3000}
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:5173}
+  minio:
+    url: ${MINIO_URL:http://minio:9000}
+    external-url: ${MINIO_EXTERNAL_URL:http://localhost:9000}
+    access-key: ${MINIO_ROOT_USER:admin}
+    secret-key: ${MINIO_ROOT_PASSWORD:password123}
+    bucket-name: ${MINIO_BUCKET_NAME:room-rental-bucket}
+  rate-limit:
+    requests-per-hour: ${RATE_LIMIT_PER_HOUR:1000}
 
 # Actuator – chỉ expose /actuator/health cho Docker healthcheck
 management:

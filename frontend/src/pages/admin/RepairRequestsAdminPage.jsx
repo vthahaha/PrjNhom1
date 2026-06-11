@@ -38,9 +38,14 @@ export default function RepairRequestsAdminPage() {
   })
 
   const columns = [
+    { title: 'STT', key: 'stt', width: 60, align: 'center', render: (_, __, index) => index + 1 },
     { title: 'Phòng', dataIndex: 'tenPhong', key: 'tenPhong', ...getColumnSearchProps('tenPhong', 'tên phòng') },
     { title: 'Khách thuê', dataIndex: 'hoTen', key: 'hoTen', ...getColumnSearchProps('hoTen', 'khách thuê') },
     { title: 'Mô tả', dataIndex: 'moTa', key: 'moTa', ellipsis: true },
+    {
+      title: 'CSVC hỏng', dataIndex: 'csvcHieuHong', key: 'csvcHieuHong',
+      render: v => v ? <Space size={[0, 4]} wrap>{v.split(', ').map(i => <Tag key={i} color="red">{i}</Tag>)}</Space> : '—'
+    },
     { title: 'Ngày gửi', dataIndex: 'ngayGui', key: 'ngayGui', render: v => dayjs(v).format('DD/MM/YYYY HH:mm') },
     { title: 'Chi phí', dataIndex: 'chiPhi', key: 'chiPhi', render: v => v ? `${Number(v).toLocaleString('vi-VN')} đ` : '—' },
     {

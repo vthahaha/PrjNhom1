@@ -12,5 +12,11 @@ public record UpdateMeRequest(
     String soDienThoai,
 
     @Email(message = "Email không hợp lệ")
-    String email
+    String email,
+
+    @Size(max = 20)
+    String cccd,
+
+    @Size(max = 255)
+    String queQuan
 ) {}

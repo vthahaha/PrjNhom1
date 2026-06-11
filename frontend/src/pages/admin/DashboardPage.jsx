@@ -46,8 +46,9 @@ export default function DashboardPage() {
   })
 
   const expiringColumns = [
+    { title: 'STT', key: 'stt', width: 60, align: 'center', render: (_, __, index) => index + 1 },
     { title: 'Phòng', dataIndex: 'tenPhong', key: 'tenPhong' },
-    { title: 'Khách thuê', dataIndex: 'hoTen', key: 'hoTen' },
+    { title: 'Khách thuê', dataIndex: 'hoTenKhach', key: 'hoTenKhach' },
     {
       title: 'Ngày hết hạn',
       dataIndex: 'ngayKetThuc',
@@ -93,46 +94,63 @@ export default function DashboardPage() {
       </div>
 
       <Row gutter={[16, 16]}>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Phòng còn trống"
-              value={overview?.phongTrong ?? 0}
-              prefix={<HomeOutlined />}
-              valueStyle={{ color: '#52c41a' }}
-            />
+        <Col xs={24} md={8}>
+          <Card title="Tình trạng phòng" style={{ height: '100%' }}>
+            <Row>
+              <Col span={12}>
+                <Statistic
+                  title="Đã thuê"
+                  value={overview?.phongDaThue ?? 0}
+                  prefix={<HomeOutlined />}
+                  valueStyle={{ color: '#1677ff' }}
+                />
+              </Col>
+              <Col span={12}>
+                <Statistic
+                  title="Còn trống"
+                  value={overview?.phongTrong ?? 0}
+                  valueStyle={{ color: '#52c41a' }}
+                />
+              </Col>
+            </Row>
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Phòng đã thuê"
-              value={overview?.phongDaThue ?? 0}
-              prefix={<HomeOutlined />}
-              valueStyle={{ color: '#1677ff' }}
-            />
+
+        <Col xs={24} md={8}>
+          <Card title="Thu & Chi" style={{ height: '100%' }}>
+            <Row>
+              <Col span={12}>
+                <Statistic
+                  title="Tổng thu"
+                  value={financeStats?.tongThu ?? 0}
+                  prefix={<RiseOutlined />}
+                  formatter={(v) => v.toLocaleString('vi-VN')}
+                  valueStyle={{ color: '#52c41a' }}
+                  suffix="₫"
+                />
+              </Col>
+              <Col span={12}>
+                <Statistic
+                  title="Tổng chi"
+                  value={financeStats?.tongChi ?? 0}
+                  prefix={<FallOutlined />}
+                  formatter={(v) => v.toLocaleString('vi-VN')}
+                  valueStyle={{ color: '#ff4d4f' }}
+                  suffix="₫"
+                />
+              </Col>
+            </Row>
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
+
+        <Col xs={24} md={8}>
+          <Card title="Thu nhập thuần" style={{ height: '100%' }}>
             <Statistic
-              title="Tổng thu (đã nhận)"
-              value={financeStats?.tongThu ?? 0}
-              prefix={<RiseOutlined />}
+              title="Lợi nhuận (Thu - Chi)"
+              value={(financeStats?.tongThu ?? 0) - (financeStats?.tongChi ?? 0)}
+              prefix={<DollarOutlined />}
               formatter={(v) => v.toLocaleString('vi-VN')}
-              valueStyle={{ color: '#52c41a' }}
-              suffix="₫"
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Tổng chi (sửa chữa)"
-              value={financeStats?.tongChi ?? 0}
-              prefix={<FallOutlined />}
-              formatter={(v) => v.toLocaleString('vi-VN')}
-              valueStyle={{ color: '#ff4d4f' }}
+              valueStyle={{ color: '#8b5cf6', fontWeight: 'bold' }}
               suffix="₫"
             />
           </Card>

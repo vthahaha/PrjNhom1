@@ -17,11 +17,13 @@ import ContractsPage from '../pages/admin/ContractsPage'
 import InvoicesPage from '../pages/admin/InvoicesPage'
 import ServicesPage from '../pages/admin/ServicesPage'
 import RepairRequestsAdminPage from '../pages/admin/RepairRequestsAdminPage'
+import AdminSettingsPage from '../pages/admin/AdminSettingsPage'
 
 import MyContractPage from '../pages/tenant/MyContractPage'
 import MyInvoicesPage from '../pages/tenant/MyInvoicesPage'
 import MyRepairRequestsPage from '../pages/tenant/MyRepairRequestsPage'
-import MyProfilePage from '../pages/tenant/MyProfilePage'
+import SettingsPage from '../pages/tenant/SettingsPage'
+import TenantDashboardPage from '../pages/tenant/TenantDashboardPage'
 
 // Route guards
 function RequireAuth({ children, role }) {
@@ -53,6 +55,7 @@ export const router = createBrowserRouter([
       { path: 'hoa-don', element: <InvoicesPage /> },
       { path: 'dich-vu', element: <ServicesPage /> },
       { path: 'sua-chua', element: <RepairRequestsAdminPage /> },
+      { path: 'cai-dat', element: <AdminSettingsPage /> },
     ],
   },
 
@@ -61,11 +64,12 @@ export const router = createBrowserRouter([
     path: '/tenant',
     element: <RequireAuth role="TENANT"><TenantLayout /></RequireAuth>,
     children: [
-      { index: true, element: <Navigate to="/tenant/hop-dong" replace /> },
+      { index: true, element: <Navigate to="/tenant/dashboard" replace /> },
+      { path: 'dashboard', element: <TenantDashboardPage /> },
       { path: 'hop-dong', element: <MyContractPage /> },
       { path: 'hoa-don', element: <MyInvoicesPage /> },
       { path: 'sua-chua', element: <MyRepairRequestsPage /> },
-      { path: 'thong-tin', element: <MyProfilePage /> },
+      { path: 'cai-dat', element: <SettingsPage /> },
     ],
   },
 

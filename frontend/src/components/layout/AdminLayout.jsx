@@ -4,7 +4,7 @@ import { Layout, Menu, Button, Avatar, Dropdown, Typography, theme } from 'antd'
 import {
   DashboardOutlined, HomeOutlined, TeamOutlined, FileTextOutlined,
   DollarOutlined, AppstoreOutlined, ToolOutlined,
-  LogoutOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined,
+  LogoutOutlined, UserOutlined, MenuFoldOutlined, MenuUnfoldOutlined, SettingOutlined
 } from '@ant-design/icons'
 import { useAuth } from '../../store/AuthContext'
 import { authApi } from '../../api'
@@ -36,21 +36,27 @@ export default function AdminLayout() {
   }
 
   const userMenu = [
+    { key: '/admin/cai-dat', icon: <SettingOutlined />, label: 'Cài đặt' },
+    { type: 'divider' },
     { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất', danger: true },
   ]
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh' }} className="animated-bg">
       <Sider
         collapsible
         collapsed={collapsed}
         trigger={null}
-        width={220}
-        style={{ background: token.colorBgContainer, borderRight: `1px solid ${token.colorBorderSecondary}` }}
+        width={240}
+        style={{ 
+          background: 'rgba(255, 255, 255, 0.4)', 
+          backdropFilter: 'blur(16px)',
+          borderRight: `1px solid rgba(255,255,255,0.6)` 
+        }}
       >
-        <div style={{ padding: '16px', textAlign: 'center', borderBottom: `1px solid ${token.colorBorderSecondary}` }}>
+        <div style={{ padding: '20px 16px', textAlign: 'center', borderBottom: `1px solid rgba(255,255,255,0.6)` }}>
           {!collapsed && (
-            <Text strong style={{ fontSize: 14, color: token.colorPrimary }}>
+            <Text strong className="gradient-text" style={{ fontSize: 18, fontWeight: 700 }}>
               🏠 Quản Lý Phòng Trọ
             </Text>
           )}
@@ -60,18 +66,22 @@ export default function AdminLayout() {
           selectedKeys={[location.pathname]}
           items={menuItems}
           onClick={({ key }) => navigate(key)}
-          style={{ border: 'none', marginTop: 8 }}
+          style={{ background: 'transparent', border: 'none', marginTop: 12 }}
         />
       </Sider>
 
-      <Layout>
+      <Layout style={{ background: 'transparent' }}>
         <Header style={{
           padding: '0 24px',
-          background: token.colorBgContainer,
-          borderBottom: `1px solid ${token.colorBorderSecondary}`,
+          background: 'rgba(255, 255, 255, 0.4)',
+          backdropFilter: 'blur(16px)',
+          borderBottom: `1px solid rgba(255,255,255,0.6)`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
         }}>
           <Button
             type="text"
@@ -79,7 +89,13 @@ export default function AdminLayout() {
             onClick={() => setCollapsed(!collapsed)}
           />
           <Dropdown
-            menu={{ items: userMenu, onClick: ({ key }) => key === 'logout' && handleLogout() }}
+            menu={{ 
+              items: userMenu, 
+              onClick: ({ key }) => {
+                if (key === 'logout') handleLogout()
+                else navigate(key)
+              } 
+            }}
             placement="bottomRight"
           >
             <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -89,8 +105,10 @@ export default function AdminLayout() {
           </Dropdown>
         </Header>
 
-        <Content style={{ margin: 24, minHeight: 'calc(100vh - 112px)' }}>
-          <Outlet />
+        <Content style={{ margin: '24px', minHeight: 'calc(100vh - 112px)', animation: 'fade-in-up 0.4s ease-out' }}>
+          <div className="glass-panel" style={{ padding: 24, borderRadius: 16, minHeight: '100%' }}>
+            <Outlet />
+          </div>
         </Content>
       </Layout>
     </Layout>

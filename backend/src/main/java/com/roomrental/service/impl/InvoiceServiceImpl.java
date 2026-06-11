@@ -141,6 +141,27 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private InvoiceResponse toResponse(Invoice i) {
+        BigDecimal tienPhong = i.getHopDong().getGiaThue();
+        BigDecimal tienDien = BigDecimal.ZERO;
+        BigDecimal tienNuoc = BigDecimal.ZERO;
+
+        if (i.getUtilityPrice() != null) {
+            BigDecimal dienTieuThu = nvl(i.getChiSoDienCuoi()).subtract(nvl(i.getChiSoDienDau()));
+            BigDecimal nuocTieuThu = nvl(i.getChiSoNuocCuoi()).subtract(nvl(i.getChiSoNuocDau()));
+            if (dienTieuThu.compareTo(BigDecimal.ZERO) > 0) {
+                tienDien = dienTieuThu.multiply(i.getUtilityPrice().getDonGiaDien());
+            }
+            if (nuocTieuThu.compareTo(BigDecimal.ZERO) > 0) {
+                tienNuoc = nuocTieuThu.multiply(i.getUtilityPrice().getDonGiaNuoc());
+            }
+        }
+
+        BigDecimal tienDichVu = nvl(i.getTongTien())
+                .subtract(nvl(tienPhong))
+                .subtract(nvl(tienDien))
+                .subtract(nvl(tienNuoc))
+                .subtract(nvl(i.getPhiKhac()));
+
         return new InvoiceResponse(
                 i.getId(),
                 i.getHopDong().getId(),
@@ -151,7 +172,8 @@ public class InvoiceServiceImpl implements InvoiceService {
                 i.getChiSoDienDau(), i.getChiSoDienCuoi(),
                 i.getChiSoNuocDau(), i.getChiSoNuocCuoi(),
                 i.getPhiKhac(), i.getGhiChuPhiKhac(),
-                i.getTongTien(), i.getHopDong().getSoNguoiO(), i.getTrangThai(),
+                i.getTongTien(), tienPhong, tienDien, tienNuoc, tienDichVu,
+                i.getHopDong().getSoNguoiO(), i.getTrangThai(),
                 i.getNgayThanhToan(), i.getCreatedAt());
     }
 }

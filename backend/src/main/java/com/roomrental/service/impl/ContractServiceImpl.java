@@ -13,6 +13,7 @@ import com.roomrental.repository.ContractRepository;
 import com.roomrental.repository.RoomRepository;
 import com.roomrental.repository.UserRepository;
 import com.roomrental.service.ContractService;
+import com.roomrental.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ public class ContractServiceImpl implements ContractService {
     private final ContractRepository contractRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final FileStorageService fileStorageService;
 
     @Override
     public List<ContractResponse> getAll(Contract.TrangThai trangThai) {
@@ -47,6 +49,9 @@ public class ContractServiceImpl implements ContractService {
         }
         if (contractRepository.existsByRoomIdAndTrangThai(request.phongId(), Contract.TrangThai.HIEU_LUC)) {
             throw new BadRequestException("Phòng đang có hợp đồng hiệu lực");
+        }
+        if (contractRepository.existsByKhachThueIdAndTrangThai(request.khachThueId(), Contract.TrangThai.HIEU_LUC)) {
+            throw new BadRequestException("Khách thuê này đang có hợp đồng hiệu lực ở một phòng khác");
         }
         User khach = userRepository.findById(request.khachThueId())
                 .orElseThrow(() -> new ResourceNotFoundException("Khách thuê không tồn tại: " + request.khachThueId()));
@@ -125,6 +130,30 @@ public class ContractServiceImpl implements ContractService {
                 .orElseThrow(() -> new ResourceNotFoundException("Bạn không có hợp đồng hiệu lực"));
     }
 
+    @Override
+    @Transactional
+    public ContractResponse uploadDocument(Long id, org.springframework.web.multipart.MultipartFile file) {
+        Contract contract = findContract(id);
+        if (contract.getFileHopDongUrl() != null) {
+            fileStorageService.deleteFile(contract.getFileHopDongUrl());
+        }
+        String filename = fileStorageService.uploadFile(file);
+        contract.setFileHopDongUrl(filename);
+        return toResponse(contractRepository.save(contract));
+    }
+
+    @Override
+    @Transactional
+    public ContractResponse deleteDocument(Long id) {
+        Contract contract = findContract(id);
+        if (contract.getFileHopDongUrl() != null) {
+            fileStorageService.deleteFile(contract.getFileHopDongUrl());
+            contract.setFileHopDongUrl(null);
+            contractRepository.save(contract);
+        }
+        return toResponse(contract);
+    }
+
     // -------- helpers --------
 
     private Contract findContract(Long id) {
@@ -140,6 +169,6 @@ public class ContractServiceImpl implements ContractService {
                 c.getNgayBatDau(), c.getNgayKetThuc(),
                 c.getGiaThue(), c.getTienCoc(),
                 c.getTrangThai(), c.getSoNguoiO(), c.getLyDoChamDut(), c.getNgayTraPhong(),
-                c.getCreatedAt());
+                c.getCreatedAt(), c.getRoom().getTienNghi(), fileStorageService.getPresignedUrl(c.getFileHopDongUrl()));
     }
 }

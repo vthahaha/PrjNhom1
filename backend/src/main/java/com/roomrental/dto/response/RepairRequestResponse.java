@@ -14,6 +14,7 @@ public record RepairRequestResponse(
     String hoTenKhach,
     String moTa,
     String anhUrl,
+    String csvcHieuHong,
     RepairRequest.TrangThai trangThai,
     LocalDateTime ngayGui,
     LocalDateTime ngayCapNhat,

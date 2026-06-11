@@ -41,6 +41,9 @@ public class RepairRequest {
     @Column(name = "ngay_cap_nhat")
     private LocalDateTime ngayCapNhat;
 
+    @Column(name = "csvc_hieu_hong", columnDefinition = "TEXT")
+    private String csvcHieuHong;
+
     @Column(name = "chi_phi", precision = 12, scale = 0)
     private BigDecimal chiPhi = BigDecimal.ZERO;
 

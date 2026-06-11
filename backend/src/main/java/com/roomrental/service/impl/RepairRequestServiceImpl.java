@@ -34,10 +34,15 @@ public class RepairRequestServiceImpl implements RepairRequestService {
         Contract contract = contractRepository
                 .findTopByKhachThueIdAndTrangThaiOrderByNgayBatDauDesc(user.getId(), Contract.TrangThai.HIEU_LUC)
                 .orElseThrow(() -> new BadRequestException("Bạn không có hợp đồng hiệu lực để gửi yêu cầu"));
+        String csvc = (request.csvcHieuHong() != null && !request.csvcHieuHong().isEmpty()) 
+                ? String.join(", ", request.csvcHieuHong()) : null;
+        String moTa = request.moTa() != null ? request.moTa() : "";
+
         RepairRequest rr = RepairRequest.builder()
                 .hopDong(contract)
-                .moTa(request.moTa())
+                .moTa(moTa)
                 .anhUrl(request.anhUrl())
+                .csvcHieuHong(csvc)
                 .trangThai(RepairRequest.TrangThai.CHO_XU_LY)
                 .build();
         return toResponse(repairRequestRepository.save(rr));
@@ -81,7 +86,7 @@ public class RepairRequestServiceImpl implements RepairRequestService {
                 rr.getHopDong().getRoom().getTenPhong(),
                 rr.getHopDong().getKhachThue().getId(),
                 rr.getHopDong().getKhachThue().getHoTen(),
-                rr.getMoTa(), rr.getAnhUrl(),
+                rr.getMoTa(), rr.getAnhUrl(), rr.getCsvcHieuHong(),
                 rr.getTrangThai(), rr.getNgayGui(), rr.getNgayCapNhat(), rr.getChiPhi());
     }
 }
