@@ -5,6 +5,7 @@ import com.roomrental.entity.Contract;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record ContractResponse(
     Long id,
@@ -23,5 +24,8 @@ public record ContractResponse(
     LocalDate ngayTraPhong,
     LocalDateTime createdAt,
     String tienNghi,
-    String fileHopDongUrl
-) {}
+    String fileHopDongUrl,
+    List<DichVuInfo> dichVu
+) {
+    public record DichVuInfo(Long id, String tenDichVu, java.math.BigDecimal donGiaMacDinh, String donVi) {}
+}

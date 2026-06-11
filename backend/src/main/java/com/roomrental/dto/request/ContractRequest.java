@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public record ContractRequest(
     @NotNull(message = "Phòng không được để trống")
@@ -26,5 +27,8 @@ public record ContractRequest(
     BigDecimal tienCoc,
 
     @Positive(message = "Số người ở phải lớn hơn 0")
-    Integer soNguoiO
+    Integer soNguoiO,
+
+    /** Danh sách ID dịch vụ đăng ký theo hợp đồng (optional) */
+    List<Long> dichVuIds
 ) {}

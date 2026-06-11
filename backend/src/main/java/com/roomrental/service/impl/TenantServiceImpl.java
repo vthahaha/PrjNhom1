@@ -147,6 +147,10 @@ public class TenantServiceImpl implements TenantService {
     }
 
     private ContractResponse toContractResponse(Contract c) {
+        java.util.List<ContractResponse.DichVuInfo> dichVuInfos = c.getDichVu() == null ? java.util.List.of() :
+            c.getDichVu().stream()
+                .map(s -> new ContractResponse.DichVuInfo(s.getId(), s.getTenDichVu(), s.getDonGiaMacDinh(), s.getDonVi()))
+                .toList();
         return new ContractResponse(
                 c.getId(),
                 c.getRoom().getId(), c.getRoom().getTenPhong(),
@@ -154,6 +158,8 @@ public class TenantServiceImpl implements TenantService {
                 c.getNgayBatDau(), c.getNgayKetThuc(),
                 c.getGiaThue(), c.getTienCoc(),
                 c.getTrangThai(), c.getSoNguoiO(), c.getLyDoChamDut(), c.getNgayTraPhong(),
-                c.getCreatedAt(), c.getRoom().getTienNghi(), fileStorageService.getPresignedUrl(c.getFileHopDongUrl()));
+                c.getCreatedAt(), c.getRoom().getTienNghi(),
+                fileStorageService.getPresignedUrl(c.getFileHopDongUrl()),
+                dichVuInfos);
     }
 }

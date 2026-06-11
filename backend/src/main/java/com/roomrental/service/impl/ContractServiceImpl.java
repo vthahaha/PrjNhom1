@@ -6,29 +6,32 @@ import com.roomrental.dto.request.ContractTerminateRequest;
 import com.roomrental.dto.response.ContractResponse;
 import com.roomrental.entity.Contract;
 import com.roomrental.entity.Room;
+import com.roomrental.entity.Service;
 import com.roomrental.entity.User;
 import com.roomrental.exception.BadRequestException;
 import com.roomrental.exception.ResourceNotFoundException;
 import com.roomrental.repository.ContractRepository;
 import com.roomrental.repository.RoomRepository;
+import com.roomrental.repository.ServiceRepository;
 import com.roomrental.repository.UserRepository;
 import com.roomrental.service.ContractService;
 import com.roomrental.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class ContractServiceImpl implements ContractService {
 
     private final ContractRepository contractRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final ServiceRepository serviceRepository;
     private final FileStorageService fileStorageService;
 
     @Override
@@ -58,6 +61,13 @@ public class ContractServiceImpl implements ContractService {
         if (request.ngayBatDau().isAfter(request.ngayKetThuc())) {
             throw new BadRequestException("Ngày bắt đầu phải trước ngày kết thúc");
         }
+
+        // Lấy danh sách dịch vụ được chọn
+        List<Service> selectedServices = new ArrayList<>();
+        if (request.dichVuIds() != null && !request.dichVuIds().isEmpty()) {
+            selectedServices = serviceRepository.findAllById(request.dichVuIds());
+        }
+
         Contract contract = Contract.builder()
                 .room(room)
                 .khachThue(khach)
@@ -67,6 +77,7 @@ public class ContractServiceImpl implements ContractService {
                 .tienCoc(request.tienCoc() != null ? request.tienCoc() : BigDecimal.ZERO)
                 .soNguoiO(request.soNguoiO() != null ? request.soNguoiO() : 1)
                 .trangThai(Contract.TrangThai.HIEU_LUC)
+                .dichVu(selectedServices)
                 .build();
         room.setTrangThai(Room.TrangThai.DA_THUE);
         roomRepository.save(room);
@@ -162,6 +173,11 @@ public class ContractServiceImpl implements ContractService {
     }
 
     ContractResponse toResponse(Contract c) {
+        List<ContractResponse.DichVuInfo> dichVuInfos = c.getDichVu() == null ? List.of() :
+            c.getDichVu().stream()
+                .map(s -> new ContractResponse.DichVuInfo(s.getId(), s.getTenDichVu(), s.getDonGiaMacDinh(), s.getDonVi()))
+                .toList();
+
         return new ContractResponse(
                 c.getId(),
                 c.getRoom().getId(), c.getRoom().getTenPhong(),
@@ -169,6 +185,8 @@ public class ContractServiceImpl implements ContractService {
                 c.getNgayBatDau(), c.getNgayKetThuc(),
                 c.getGiaThue(), c.getTienCoc(),
                 c.getTrangThai(), c.getSoNguoiO(), c.getLyDoChamDut(), c.getNgayTraPhong(),
-                c.getCreatedAt(), c.getRoom().getTienNghi(), fileStorageService.getPresignedUrl(c.getFileHopDongUrl()));
+                c.getCreatedAt(), c.getRoom().getTienNghi(),
+                fileStorageService.getPresignedUrl(c.getFileHopDongUrl()),
+                dichVuInfos);
     }
 }
