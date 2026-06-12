@@ -49,16 +49,16 @@ export default function MonthlyDebtsPage() {
   const sendEmailMutation = useMutation({
     mutationFn: invoiceApi.sendInvoice,
     onSuccess: () => {
-      message.success('Đã gửi email hóa đơn thành công')
+      message.success('Đã gửi hóa đơn thành công')
       invalidate()
     },
-    onError: (e) => message.error(e.response?.data?.message || 'Lỗi khi gửi email'),
+    onError: (e) => message.error(e.response?.data?.message || 'Lỗi khi gửi hóa đơn'),
   })
 
   const sendBulkMutation = useMutation({
     mutationFn: () => invoiceApi.sendBulk(thang, nam),
     onSuccess: () => {
-      message.success('Đã gửi email hóa đơn hàng loạt thành công')
+      message.success('Đã gửi hóa đơn hàng loạt thành công')
       invalidate()
     },
     onError: (e) => message.error(e.response?.data?.message || 'Lỗi khi gửi hàng loạt'),
@@ -71,8 +71,6 @@ export default function MonthlyDebtsPage() {
       chiSoDienCuoi: record.chiSoDienCuoi,
       chiSoNuocDau: record.chiSoNuocDau,
       chiSoNuocCuoi: record.chiSoNuocCuoi,
-      phiKhac: record.phiKhac,
-      ghiChuPhiKhac: record.ghiChuPhiKhac,
     })
     setEditModalOpen(true)
   }
@@ -149,7 +147,7 @@ export default function MonthlyDebtsPage() {
       key: 'daGui',
       width: 120,
       align: 'center',
-      render: v => v ? <Tag color="green">Đã gửi email</Tag> : <Tag color="default">Chưa gửi</Tag>
+      render: v => v ? <Tag color="green">Đã gửi</Tag> : <Tag color="default">Chưa gửi</Tag>
     },
     {
       title: 'Thao tác',
@@ -165,7 +163,7 @@ export default function MonthlyDebtsPage() {
           >
             Chỉ số
           </Button>
-          <Tooltip title={r.trangThai === 'DA_TT' ? 'Hóa đơn đã thanh toán' : 'Gửi email chi tiết hóa đơn đến khách thuê'}>
+          <Tooltip title={r.trangThai === 'DA_TT' ? 'Hóa đơn đã thanh toán' : 'Gửi hóa đơn đến tài khoản khách thuê'}>
             <Button 
               size="small" 
               type="primary" 
@@ -206,7 +204,7 @@ export default function MonthlyDebtsPage() {
           </Button>
           {totalRooms > 0 && (
             <Popconfirm 
-              title="Xác nhận gửi email hóa đơn hàng loạt cho tất cả các phòng?" 
+              title="Xác nhận gửi hóa đơn hàng loạt cho tất cả các phòng?" 
               onConfirm={() => sendBulkMutation.mutate()} 
               okText="Gửi" 
               cancelText="Hủy"
@@ -294,13 +292,7 @@ export default function MonthlyDebtsPage() {
             </Row>
           </Card>
 
-          <Form.Item label="Phí phát sinh khác (nếu có)" name="phiKhac">
-            <InputNumber style={{ width: '100%' }} min={0} step={1000} formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} />
-          </Form.Item>
 
-          <Form.Item label="Ghi chú phí phát sinh" name="ghiChuPhiKhac">
-            <Input.TextArea rows={2} placeholder="Nêu lý do thu thêm phụ phí..." />
-          </Form.Item>
 
           <Form.Item style={{ textAlign: 'right', marginBottom: 0 }}>
             <Space>

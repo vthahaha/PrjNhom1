@@ -46,7 +46,7 @@ export default function TenantLayout() {
         }}
       >
         <div style={{ padding: '20px 16px', textAlign: 'center', borderBottom: `1px solid rgba(255,255,255,0.6)` }}>
-          <Text strong className="gradient-text" style={{ fontSize: 18, fontWeight: 700 }}>🏠 Phòng Trọ</Text>
+          <Text strong className="gradient-text" style={{ fontSize: 18, fontWeight: 700 }}>🏠 MyRoom</Text>
         </div>
         <Menu
           mode="inline"

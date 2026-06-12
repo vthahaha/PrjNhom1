@@ -30,7 +30,7 @@ export default function RegisterPage() {
     }}>
       <Card style={{ width: 420, boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <Title level={3} style={{ marginBottom: 4 }}>🏠 Quản Lý Phòng Trọ</Title>
+          <Title level={3} style={{ marginBottom: 4 }}>🏠 MyRoom</Title>
           <Text type="secondary">Đăng ký tài khoản mới</Text>
         </div>
 

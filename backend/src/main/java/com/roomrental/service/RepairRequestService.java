@@ -2,7 +2,7 @@ package com.roomrental.service;
 
 import com.roomrental.dto.request.RepairRequestCreate;
 import com.roomrental.dto.response.RepairRequestResponse;
-import com.roomrental.entity.RepairRequest;
+
 
 import java.time.LocalDateTime;
 import java.util.List;

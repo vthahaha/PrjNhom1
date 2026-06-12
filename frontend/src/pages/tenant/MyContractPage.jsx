@@ -2,7 +2,6 @@ import { Card, Descriptions, Tag, Typography, Spin, Empty } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { contractApi } from '../../api'
-import qrImage from '../../img/download.jpg'
 
 const { Title } = Typography
 
@@ -44,9 +43,7 @@ export default function MyContractPage() {
               <span style={{ color: 'gray' }}>Chưa có file</span>
             )}
           </Descriptions.Item>
-          <Descriptions.Item label="Mã QR Thanh Toán" span={2}>
-            <img src={qrImage} alt="QR Code" style={{ width: 150, height: 150, objectFit: 'contain', border: '1px solid #d9d9d9', borderRadius: 8, padding: 4 }} />
-          </Descriptions.Item>
+
         </Descriptions>
       </Card>
     </div>

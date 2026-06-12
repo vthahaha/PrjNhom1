@@ -65,7 +65,7 @@ export default function AdminLayout() {
         <div style={{ padding: '20px 16px', textAlign: 'center', borderBottom: `1px solid rgba(255,255,255,0.6)` }}>
           {!collapsed && (
             <Text strong className="gradient-text" style={{ fontSize: 18, fontWeight: 700 }}>
-              🏠 Quản Lý Phòng Trọ
+              🏠 MyRoom
             </Text>
           )}
         </div>

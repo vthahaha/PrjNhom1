@@ -181,7 +181,11 @@ export default function ContractsPage() {
 
           <Form.Item label="Khách thuê" name="khachThueId" rules={[{ required: true }]}>
             <Select placeholder="Chọn khách thuê" showSearch optionFilterProp="children">
-              {tenants?.map(t => <Option key={t.id} value={t.id}>{t.hoTen} — {t.soDienThoai}</Option>)}
+              {tenants?.map(t => (
+                <Option key={t.id} value={t.id} disabled={t.coHopDong}>
+                  {t.hoTen} — {t.soDienThoai} {t.coHopDong ? `(Đang thuê phòng ${t.tenPhong})` : ''}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 

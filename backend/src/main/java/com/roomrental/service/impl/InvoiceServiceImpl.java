@@ -63,7 +63,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         BigDecimal dienCuoi = nvl(req.chiSoDienCuoi());
         BigDecimal nuocDau  = nvl(req.chiSoNuocDau());
         BigDecimal nuocCuoi = nvl(req.chiSoNuocCuoi());
-        BigDecimal phiKhac  = nvl(req.phiKhac());
 
         BigDecimal tieuThuDien = dienCuoi.subtract(dienDau);
         BigDecimal tieuThuNuoc = nuocCuoi.subtract(nuocDau);
@@ -90,7 +89,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
 
         BigDecimal tongTien = contract.getGiaThue()
-                .add(tienDien).add(tienNuoc).add(tienDichVuThem).add(phiKhac);
+                .add(tienDien).add(tienNuoc).add(tienDichVuThem);
 
         Invoice invoice = Invoice.builder()
                 .hopDong(contract)
@@ -101,8 +100,8 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .chiSoDienCuoi(dienCuoi)
                 .chiSoNuocDau(nuocDau)
                 .chiSoNuocCuoi(nuocCuoi)
-                .phiKhac(phiKhac)
-                .ghiChuPhiKhac(req.ghiChuPhiKhac())
+                .phiKhac(BigDecimal.ZERO)
+                .ghiChuPhiKhac(null)
                 .tongTien(tongTien)
                 .trangThai(Invoice.TrangThai.CHUA_TT)
                 .daGui(false)
@@ -123,7 +122,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         BigDecimal dienCuoi = nvl(req.chiSoDienCuoi());
         BigDecimal nuocDau  = nvl(req.chiSoNuocDau());
         BigDecimal nuocCuoi = nvl(req.chiSoNuocCuoi());
-        BigDecimal phiKhac  = nvl(req.phiKhac());
 
         BigDecimal tieuThuDien = dienCuoi.subtract(dienDau);
         BigDecimal tieuThuNuoc = nuocCuoi.subtract(nuocDau);
@@ -134,8 +132,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setChiSoDienCuoi(dienCuoi);
         invoice.setChiSoNuocDau(nuocDau);
         invoice.setChiSoNuocCuoi(nuocCuoi);
-        invoice.setPhiKhac(phiKhac);
-        invoice.setGhiChuPhiKhac(req.ghiChuPhiKhac());
+        invoice.setPhiKhac(BigDecimal.ZERO);
+        invoice.setGhiChuPhiKhac(null);
 
         UtilityPrice utilityPrice = invoice.getUtilityPrice();
         if (utilityPrice == null) {
@@ -164,7 +162,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
 
         BigDecimal tongTien = contract.getGiaThue()
-                .add(tienDien).add(tienNuoc).add(tienDichVuThem).add(phiKhac);
+                .add(tienDien).add(tienNuoc).add(tienDichVuThem);
 
         invoice.setTongTien(tongTien);
 
@@ -193,7 +191,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         User user = userRepository.findBySoDienThoai(soDienThoai)
                 .orElseThrow(() -> new ResourceNotFoundException("Người dùng không tồn tại"));
         return invoiceRepository.findByHopDongKhachThueId(user.getId())
-                .stream().map(this::toResponse).toList();
+                .stream()
+                .filter(Invoice::getDaGui)
+                .map(this::toResponse).toList();
     }
 
     @Override
@@ -262,67 +262,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Transactional
     public void sendInvoice(Long id) {
         Invoice invoice = findInvoice(id);
-        User tenant = invoice.getHopDong().getKhachThue();
-        if (tenant.getEmail() == null || tenant.getEmail().trim().isEmpty()) {
-            // Đánh dấu đã gửi (hoặc bỏ qua) nếu khách hàng không có email
-            invoice.setDaGui(true);
-            invoiceRepository.save(invoice);
-            return;
-        }
-
-        BigDecimal tienPhong = invoice.getHopDong().getGiaThue();
-        int soNguoi = invoice.getHopDong().getSoNguoiO();
-        BigDecimal tienPhongChiaDauNguoi = tienPhong.divide(BigDecimal.valueOf(Math.max(1, soNguoi)), 0, RoundingMode.HALF_UP);
-
-        BigDecimal dienTieuThu = nvl(invoice.getChiSoDienCuoi()).subtract(nvl(invoice.getChiSoDienDau()));
-        BigDecimal nuocTieuThu = nvl(invoice.getChiSoNuocCuoi()).subtract(nvl(invoice.getChiSoNuocDau()));
-
-        BigDecimal unitPriceDien = invoice.getUtilityPrice() != null ? invoice.getUtilityPrice().getDonGiaDien() : BigDecimal.ZERO;
-        BigDecimal unitPriceNuoc = invoice.getUtilityPrice() != null ? invoice.getUtilityPrice().getDonGiaNuoc() : BigDecimal.ZERO;
-
-        BigDecimal tienDien = dienTieuThu.multiply(unitPriceDien);
-        BigDecimal tienNuoc = nuocTieuThu.multiply(unitPriceNuoc);
-
-        StringBuilder servicesHtml = new StringBuilder();
-        List<RoomService> services = roomServiceRepository.findByRoomId(invoice.getHopDong().getRoom().getId());
-        BigDecimal totalServices = BigDecimal.ZERO;
-        for (RoomService rs : services) {
-            BigDecimal price = rs.getDonGiaOverride() != null ? rs.getDonGiaOverride() : rs.getService().getDonGiaMacDinh();
-            String donVi = rs.getService().getDonVi();
-            BigDecimal subtotal;
-            if (donVi != null && donVi.toLowerCase().contains("người")) {
-                subtotal = price.multiply(BigDecimal.valueOf(soNguoi));
-                servicesHtml.append(String.format("<li>%s: %s đ x %d người = %s đ</li>", rs.getService().getTenDichVu(), formatMoney(price), soNguoi, formatMoney(subtotal)));
-            } else {
-                subtotal = price;
-                servicesHtml.append(String.format("<li>%s: %s đ</li>", rs.getService().getTenDichVu(), formatMoney(price)));
-            }
-            totalServices = totalServices.add(subtotal);
-        }
-
-        String subject = String.format("Thông báo đóng tiền phòng tháng %d/%d - Phòng %s", invoice.getThang(), invoice.getNam(), invoice.getHopDong().getRoom().getTenPhong());
-
-        String htmlBody = "<html><body style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>" +
-                "<h3>THÔNG BÁO THANH TOÁN TIỀN PHÒNG</h3>" +
-                "<p>Kính gửi quý khách <b>" + tenant.getHoTen() + "</b>,</p>" +
-                "<p>Hệ thống xin gửi bảng kê chi tiết hóa đơn tháng <b>" + invoice.getThang() + "/" + invoice.getNam() + "</b> của phòng <b>" + invoice.getHopDong().getRoom().getTenPhong() + "</b>:</p>" +
-                "<table border='1' cellpadding='8' style='border-collapse: collapse; min-width: 500px; border-color: #ddd;'>" +
-                "  <tr style='background-color: #f2f2f2; text-align: left;'><th>Khoản mục</th><th>Chi tiết</th><th>Thành tiền (VNĐ)</th></tr>" +
-                "  <tr><td><b>Tiền phòng</b></td><td>Giá thuê gốc: " + formatMoney(tienPhong) + " đ<br/>Chia đầu người (" + soNguoi + " người): <b>" + formatMoney(tienPhongChiaDauNguoi) + " đ/người</b></td><td>" + formatMoney(tienPhong) + " đ</td></tr>" +
-                "  <tr><td><b>Tiền điện</b></td><td>Chỉ số: " + invoice.getChiSoDienDau() + " -> " + invoice.getChiSoDienCuoi() + " (Tiêu thụ: " + dienTieuThu + " kWh x " + formatMoney(unitPriceDien) + " đ)</td><td>" + formatMoney(tienDien) + " đ</td></tr>" +
-                "  <tr><td><b>Tiền nước</b></td><td>Chỉ số: " + invoice.getChiSoNuocDau() + " -> " + invoice.getChiSoNuocCuoi() + " (Tiêu thụ: " + nuocTieuThu + " m3 x " + formatMoney(unitPriceNuoc) + " đ)</td><td>" + formatMoney(tienNuoc) + " đ</td></tr>" +
-                "  <tr><td><b>Tiền dịch vụ thêm</b></td><td><ul style='margin: 0; padding-left: 16px;'>" + (servicesHtml.length() == 0 ? "<li>Không sử dụng dịch vụ phụ trợ</li>" : servicesHtml.toString()) + "</ul></td><td>" + formatMoney(totalServices) + " đ</td></tr>";
-
-        if (invoice.getPhiKhac().compareTo(BigDecimal.ZERO) > 0) {
-            htmlBody += "  <tr><td><b>Phí khác</b></td><td>" + (invoice.getGhiChuPhiKhac() != null ? invoice.getGhiChuPhiKhac() : "Phụ phí phát sinh") + "</td><td>" + formatMoney(invoice.getPhiKhac()) + " đ</td></tr>";
-        }
-
-        htmlBody += "  <tr style='background-color: #ffe6e6;'><td><b>TỔNG CỘNG</b></td><td></td><td><b style='color: red; font-size: 16px;'>" + formatMoney(invoice.getTongTien()) + " đ</b></td></tr>" +
-                "</table>" +
-                "<p>Quý khách vui lòng thanh toán đúng hạn. Xin chân thành cảm ơn!</p>" +
-                "</body></html>";
-
-        mailService.sendHtmlMessage(tenant.getEmail(), subject, htmlBody);
         invoice.setDaGui(true);
         invoiceRepository.save(invoice);
     }
@@ -332,7 +271,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     public void sendBulkInvoices(int thang, int nam) {
         List<Invoice> invoices = invoiceRepository.findByFilter(thang, nam, null, null);
         for (Invoice i : invoices) {
-            sendInvoice(i.getId());
+            i.setDaGui(true);
+            invoiceRepository.save(i);
         }
     }
 
