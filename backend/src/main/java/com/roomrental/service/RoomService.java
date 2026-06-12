@@ -7,7 +7,7 @@ import com.roomrental.entity.Room;
 import java.util.List;
 
 public interface RoomService {
-    List<RoomResponse> getAll(String search, Room.TrangThai trangThai);
+    List<RoomResponse> getAll(String search, Room.TrangThai trangThai, Boolean availableForContract);
     RoomResponse create(RoomRequest request);
     RoomResponse getById(Long id);
     RoomResponse update(Long id, RoomRequest request);

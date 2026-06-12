@@ -17,7 +17,15 @@ const menuItems = [
   { key: '/admin/phong',      icon: <HomeOutlined />,      label: 'Phòng trọ' },
   { key: '/admin/khach-thue', icon: <TeamOutlined />,      label: 'Khách thuê' },
   { key: '/admin/hop-dong',   icon: <FileTextOutlined />,  label: 'Hợp đồng' },
-  { key: '/admin/hoa-don',    icon: <DollarOutlined />,    label: 'Hóa đơn' },
+  {
+    key: 'hoa-don-submenu',
+    icon: <DollarOutlined />,
+    label: 'Hóa đơn',
+    children: [
+      { key: '/admin/hoa-don/cong-no', label: 'Công nợ theo tháng' },
+      { key: '/admin/hoa-don/danh-sach', label: 'Quản lý hóa đơn' },
+    ]
+  },
   { key: '/admin/dich-vu',    icon: <AppstoreOutlined />,  label: 'Dịch vụ' },
   { key: '/admin/sua-chua',   icon: <ToolOutlined />,      label: 'Sửa chữa' },
 ]
@@ -64,6 +72,7 @@ export default function AdminLayout() {
         <Menu
           mode="inline"
           selectedKeys={[location.pathname]}
+          defaultOpenKeys={['hoa-don-submenu']}
           items={menuItems}
           onClick={({ key }) => navigate(key)}
           style={{ background: 'transparent', border: 'none', marginTop: 12 }}

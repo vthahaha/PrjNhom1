@@ -14,5 +14,7 @@ public record TenantResponse(
     LocalDateTime createdAt,
     boolean coHopDongHieuLuc,
     String cccd,
-    String queQuan
+    String queQuan,
+    String tenPhong,
+    java.time.LocalDate ngayBatDauHopDong
 ) {}

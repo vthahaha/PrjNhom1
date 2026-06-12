@@ -58,6 +58,10 @@ public class Invoice {
     @Column(name = "trang_thai", nullable = false)
     private TrangThai trangThai = TrangThai.CHUA_TT;
 
+    @Builder.Default
+    @Column(name = "da_gui", nullable = false)
+    private Boolean daGui = false;
+
     @Column(name = "ngay_thanh_toan")
     private LocalDateTime ngayThanhToan;
 

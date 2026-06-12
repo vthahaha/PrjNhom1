@@ -24,8 +24,9 @@ public class RoomController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<RoomResponse>> getAll(
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) Room.TrangThai trangThai) {
-        return ResponseEntity.ok(roomService.getAll(search, trangThai));
+            @RequestParam(required = false) Room.TrangThai trangThai,
+            @RequestParam(required = false) Boolean availableForContract) {
+        return ResponseEntity.ok(roomService.getAll(search, trangThai, availableForContract));
     }
 
     @PostMapping

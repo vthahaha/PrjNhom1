@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import {
   Table, Button, Tag, Input, Select, Space, Modal, Form,
-  InputNumber, Typography, App, Popconfirm,
+  InputNumber, Typography, App, Popconfirm, Checkbox
 } from 'antd'
 import { PlusOutlined, SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { roomApi } from '../../api'
+import { roomApi, serviceApi } from '../../api'
 import { getColumnSearchProps } from '../../utils/tableUtils'
 
 const { Title } = Typography
@@ -36,16 +36,32 @@ export default function RoomsPage() {
     queryFn: () => roomApi.getAll({ search, trangThai }).then(r => r.data),
   })
 
+  const { data: allServices } = useQuery({
+    queryKey: ['services'],
+    queryFn: () => serviceApi.getAll().then(r => r.data)
+  })
+
   const invalidate = () => qc.invalidateQueries({ queryKey: ['rooms'] })
 
   const createMutation = useMutation({
-    mutationFn: roomApi.create,
+    mutationFn: async (data) => {
+      const roomRes = await roomApi.create(data.roomData)
+      const roomId = roomRes.data.id
+      if (data.servicesData && data.servicesData.items.length > 0) {
+        await roomApi.updateServices(roomId, data.servicesData)
+      }
+      return roomRes.data
+    },
     onSuccess: () => { message.success('Thêm phòng thành công'); closeModal(); invalidate() },
     onError: (e) => message.error(e.response?.data?.message || 'Lỗi khi thêm phòng'),
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => roomApi.update(id, data),
+    mutationFn: async ({ id, data }) => {
+      const roomRes = await roomApi.update(id, data.roomData)
+      await roomApi.updateServices(id, data.servicesData)
+      return roomRes.data
+    },
     onSuccess: () => { message.success('Cập nhật thành công'); closeModal(); invalidate() },
     onError: (e) => message.error(e.response?.data?.message || 'Lỗi khi cập nhật'),
   })
@@ -56,24 +72,68 @@ export default function RoomsPage() {
     onError: (e) => message.error(e.response?.data?.message || 'Không thể xóa phòng này'),
   })
 
-  const openCreate = () => { setEditingRoom(null); form.resetFields(); setModalOpen(true) }
-  const openEdit = (room) => {
+  const openCreate = () => {
+    setEditingRoom(null)
+    form.resetFields()
+    form.setFieldsValue({ services: {} })
+    setModalOpen(true)
+  }
+
+  const openEdit = async (room) => {
     setEditingRoom(room)
     form.setFieldsValue({
       ...room,
-      tienNghi: room.tienNghi ? room.tienNghi.split(', ') : []
+      tienNghi: room.tienNghi ? room.tienNghi.split(', ') : [],
+      services: {}
     })
     setModalOpen(true)
+
+    try {
+      const res = await roomApi.getServices(room.id)
+      const servicesMap = {}
+      res.data.forEach(s => {
+        servicesMap[s.dichVuId] = {
+          checked: true,
+          donGiaOverride: s.donGiaOverride
+        }
+      })
+      form.setFieldsValue({ services: servicesMap })
+    } catch (err) {
+      message.error('Lỗi khi tải danh sách dịch vụ của phòng')
+    }
   }
+
   const closeModal = () => { setModalOpen(false); setEditingRoom(null); form.resetFields() }
 
   const onFinish = (values) => {
-    const data = {
-      ...values,
+    const roomData = {
+      tenPhong: values.tenPhong,
+      giaThue: values.giaThue,
+      dienTich: values.dienTich,
+      soNguoiToiDa: values.soNguoiToiDa,
       tienNghi: Array.isArray(values.tienNghi) ? values.tienNghi.join(', ') : values.tienNghi
     }
-    if (editingRoom) updateMutation.mutate({ id: editingRoom.id, data })
-    else createMutation.mutate(data)
+
+    const items = []
+    if (values.services) {
+      Object.keys(values.services).forEach(svcId => {
+        const svcInfo = values.services[svcId]
+        if (svcInfo && svcInfo.checked) {
+          items.push({
+            dichVuId: Number(svcId),
+            donGiaOverride: svcInfo.donGiaOverride || null
+          })
+        }
+      })
+    }
+
+    const servicesData = { items }
+
+    if (editingRoom) {
+      updateMutation.mutate({ id: editingRoom.id, data: { roomData, servicesData } })
+    } else {
+      createMutation.mutate({ roomData, servicesData })
+    }
   }
 
   const columns = [
@@ -182,6 +242,50 @@ export default function RoomsPage() {
               options={COMMON_FACILITIES.map(f => ({ label: f, value: f }))}
             />
           </Form.Item>
+
+          <Typography.Title level={5} style={{ marginTop: 16, marginBottom: 8 }}>Dịch vụ gán kèm</Typography.Title>
+          <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid #d9d9d9', borderRadius: 8, padding: '8px 12px', marginBottom: 16, background: '#fafafa' }}>
+            {allServices?.map(svc => (
+              <div key={svc.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <Form.Item
+                  name={['services', svc.id, 'checked']}
+                  valuePropName="checked"
+                  style={{ marginBottom: 0 }}
+                >
+                  <Checkbox>
+                    <span style={{ fontWeight: 500 }}>{svc.tenDichVu}</span>
+                    <Typography.Text type="secondary" style={{ marginLeft: 8, fontSize: 12 }}>
+                      ({Number(svc.donGiaMacDinh).toLocaleString('vi-VN')} đ/{svc.donVi})
+                    </Typography.Text>
+                  </Checkbox>
+                </Form.Item>
+                
+                <Form.Item
+                  noStyle
+                  shouldUpdate={(prev, curr) => prev?.services?.[svc.id]?.checked !== curr?.services?.[svc.id]?.checked}
+                >
+                  {({ getFieldValue }) => {
+                    const isChecked = getFieldValue(['services', svc.id, 'checked'])
+                    return isChecked ? (
+                      <Form.Item
+                        name={['services', svc.id, 'donGiaOverride']}
+                        style={{ marginBottom: 0 }}
+                      >
+                        <InputNumber
+                          placeholder="Giá riêng (nếu có)"
+                          style={{ width: 160 }}
+                          min={0}
+                          addonAfter="đ"
+                          formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                          parser={(v) => v.replace(/\$\s?|(,*)/g, '')}
+                        />
+                      </Form.Item>
+                    ) : null
+                  }}
+                </Form.Item>
+              </div>
+            ))}
+          </div>
           <Form.Item style={{ textAlign: 'right', marginBottom: 0 }}>
             <Space>
               <Button onClick={closeModal}>Hủy</Button>

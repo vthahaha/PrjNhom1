@@ -66,7 +66,7 @@ export default function InvoicesPage() {
     { title: 'Phòng', dataIndex: 'tenPhong', key: 'tenPhong', ...getColumnSearchProps('tenPhong', 'tên phòng') },
     { title: 'Tháng/Năm', key: 'kyHoaDon', render: (_, r) => `${r.thang}/${r.nam}` },
     { title: 'Tổng tiền', dataIndex: 'tongTien', key: 'tongTien', render: v => `${Number(v).toLocaleString('vi-VN')} đ` },
-    { title: 'Tiền/người', key: 'tienNguoi', render: (_, r) => `${Number(r.tongTien / (r.soNguoiO || 1)).toLocaleString('vi-VN')} đ` },
+    { title: 'Tiền phòng/người', key: 'tienPhongNguoi', render: (_, r) => `${Math.round(r.tienPhong / (r.soNguoiO || 1)).toLocaleString('vi-VN')} đ` },
     {
       title: 'Trạng thái', dataIndex: 'trangThai', key: 'trangThai',
       render: v => <Tag color={v === 'DA_TT' ? 'green' : 'orange'}>{v === 'DA_TT' ? 'Đã thanh toán' : 'Chưa thanh toán'}</Tag>,
@@ -168,7 +168,14 @@ export default function InvoicesPage() {
         {selectedInvoice && (
           <Descriptions bordered column={1} size="small">
             <Descriptions.Item label="Phòng">{selectedInvoice.tenPhong}</Descriptions.Item>
-            <Descriptions.Item label="Tiền phòng">{Number(selectedInvoice.tienPhong || 0).toLocaleString('vi-VN')} đ</Descriptions.Item>
+            <Descriptions.Item label="Tiền phòng">
+              <div>
+                <b>{Number(selectedInvoice.tienPhong || 0).toLocaleString('vi-VN')} đ</b>
+                <span style={{ fontSize: 12, color: 'gray', marginLeft: 8 }}>
+                  (Chia đầu người: {Math.round((selectedInvoice.tienPhong || 0) / (selectedInvoice.soNguoiO || 1)).toLocaleString('vi-VN')} đ/người - {selectedInvoice.soNguoiO} người)
+                </span>
+              </div>
+            </Descriptions.Item>
             <Descriptions.Item label="Tiền điện">
               {Number(selectedInvoice.tienDien || 0).toLocaleString('vi-VN')} đ
               <br/>

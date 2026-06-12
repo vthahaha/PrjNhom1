@@ -58,10 +58,14 @@ export const invoiceApi = {
   getAll: (params) => api.get('/invoices', { params }),
   getById: (id) => api.get(`/invoices/${id}`),
   create: (data) => api.post('/invoices', data),
+  update: (id, data) => api.put(`/invoices/${id}`, data),
   markPaid: (id) => api.patch(`/invoices/${id}/paid`),
   getMyInvoices: () => api.get('/me/invoices'),
   getUtilityPrices: () => api.get('/utility-prices'),
   setUtilityPrice: (data) => api.post('/utility-prices', data),
+  generateMonthly: (thang, nam) => api.post('/invoices/generate-monthly', null, { params: { thang, nam } }),
+  sendInvoice: (id) => api.post(`/invoices/${id}/send`),
+  sendBulk: (thang, nam) => api.post('/invoices/send-bulk', null, { params: { thang, nam } }),
 }
 
 // ── SERVICES ──────────────────────────────────────────────

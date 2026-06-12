@@ -13,6 +13,8 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
 
     List<Contract> findByTrangThai(Contract.TrangThai trangThai);
 
+    List<Contract> findByRoomIdAndTrangThai(Long roomId, Contract.TrangThai trangThai);
+
     boolean existsByRoomIdAndTrangThai(Long roomId, Contract.TrangThai trangThai);
 
     boolean existsByKhachThueIdAndTrangThai(Long userId, Contract.TrangThai trangThai);

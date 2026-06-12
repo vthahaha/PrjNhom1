@@ -23,9 +23,19 @@ public class RoomServiceImpl implements RoomService {
     private final ContractRepository contractRepository;
 
     @Override
-    public List<RoomResponse> getAll(String search, Room.TrangThai trangThai) {
-        return roomRepository.findByFilter(search, trangThai)
-                .stream().map(this::toResponse).toList();
+    public List<RoomResponse> getAll(String search, Room.TrangThai trangThai, Boolean availableForContract) {
+        List<Room> rooms = roomRepository.findByFilter(search, trangThai);
+        if (Boolean.TRUE.equals(availableForContract)) {
+            return rooms.stream()
+                    .filter(r -> r.getTrangThai() != Room.TrangThai.DANG_SUA)
+                    .map(this::toResponse)
+                    .filter(res -> {
+                        int maxOccupants = res.soNguoiToiDa() != null ? res.soNguoiToiDa() : 2;
+                        return res.soNguoiDaO() < maxOccupants;
+                    })
+                    .toList();
+        }
+        return rooms.stream().map(this::toResponse).toList();
     }
 
     @Override
@@ -82,8 +92,10 @@ public class RoomServiceImpl implements RoomService {
     }
 
     private RoomResponse toResponse(Room room) {
+        List<Contract> activeContracts = contractRepository.findByRoomIdAndTrangThai(room.getId(), Contract.TrangThai.HIEU_LUC);
+        int currentOccupants = activeContracts.stream().mapToInt(Contract::getSoNguoiO).sum();
         return new RoomResponse(room.getId(), room.getTenPhong(), room.getDienTich(),
                 room.getSoNguoiToiDa(), room.getTienNghi(), room.getGiaThue(),
-                room.getTrangThai(), room.getCreatedAt());
+                room.getTrangThai(), room.getCreatedAt(), currentOccupants);
     }
 }

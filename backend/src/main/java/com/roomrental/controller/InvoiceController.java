@@ -43,6 +43,36 @@ public class InvoiceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(invoiceService.create(request));
     }
 
+    @PutMapping("/api/invoices/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<InvoiceResponse> update(@PathVariable Long id, @Valid @RequestBody InvoiceRequest request) {
+        return ResponseEntity.ok(invoiceService.update(id, request));
+    }
+
+    @PostMapping("/api/invoices/generate-monthly")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<InvoiceResponse>> generateMonthly(
+            @RequestParam int thang,
+            @RequestParam int nam) {
+        return ResponseEntity.ok(invoiceService.generateMonthlyInvoices(thang, nam));
+    }
+
+    @PostMapping("/api/invoices/{id}/send")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> sendInvoice(@PathVariable Long id) {
+        invoiceService.sendInvoice(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/api/invoices/send-bulk")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> sendBulk(
+            @RequestParam int thang,
+            @RequestParam int nam) {
+        invoiceService.sendBulkInvoices(thang, nam);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/api/invoices/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<InvoiceResponse> getById(@PathVariable Long id) {

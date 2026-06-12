@@ -15,6 +15,7 @@ import RoomsPage from '../pages/admin/RoomsPage'
 import TenantsPage from '../pages/admin/TenantsPage'
 import ContractsPage from '../pages/admin/ContractsPage'
 import InvoicesPage from '../pages/admin/InvoicesPage'
+import MonthlyDebtsPage from '../pages/admin/MonthlyDebtsPage'
 import ServicesPage from '../pages/admin/ServicesPage'
 import RepairRequestsAdminPage from '../pages/admin/RepairRequestsAdminPage'
 import AdminSettingsPage from '../pages/admin/AdminSettingsPage'
@@ -52,7 +53,9 @@ export const router = createBrowserRouter([
       { path: 'phong', element: <RoomsPage /> },
       { path: 'khach-thue', element: <TenantsPage /> },
       { path: 'hop-dong', element: <ContractsPage /> },
-      { path: 'hoa-don', element: <InvoicesPage /> },
+      { path: 'hoa-don', element: <Navigate to="/admin/hoa-don/danh-sach" replace /> },
+      { path: 'hoa-don/cong-no', element: <MonthlyDebtsPage /> },
+      { path: 'hoa-don/danh-sach', element: <InvoicesPage /> },
       { path: 'dich-vu', element: <ServicesPage /> },
       { path: 'sua-chua', element: <RepairRequestsAdminPage /> },
       { path: 'cai-dat', element: <AdminSettingsPage /> },

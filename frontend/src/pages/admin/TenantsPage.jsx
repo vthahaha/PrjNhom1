@@ -3,10 +3,11 @@ import { Table, Button, Tag, Typography, App, Popconfirm, Space, Modal, Form, In
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import dayjs from 'dayjs'
 import { tenantApi } from '../../api'
 import { getColumnSearchProps } from '../../utils/tableUtils'
 
-const { Title } = Typography
+const { Title, Text } = Typography
 
 export default function TenantsPage() {
   const [modalOpen, setModalOpen] = useState(false)
@@ -49,8 +50,10 @@ export default function TenantsPage() {
     { title: 'STT', key: 'stt', width: 60, align: 'center', render: (_, __, index) => index + 1 },
     { title: 'Họ tên', dataIndex: 'hoTen', key: 'hoTen', ...getColumnSearchProps('hoTen', 'họ tên') },
     { title: 'Số điện thoại', dataIndex: 'soDienThoai', key: 'soDienThoai', ...getColumnSearchProps('soDienThoai', 'số điện thoại') },
-    { title: 'Email', dataIndex: 'email', key: 'email' },
     { title: 'CCCD', dataIndex: 'cccd', key: 'cccd' },
+    { title: 'Phòng', dataIndex: 'tenPhong', key: 'tenPhong', render: v => v ? <Tag color="purple">{v}</Tag> : <Text type="secondary">Chưa thuê</Text> },
+    { title: 'Ngày ký HĐ', dataIndex: 'ngayBatDauHopDong', key: 'ngayBatDauHopDong', render: v => v ? dayjs(v).format('DD/MM/YYYY') : '—' },
+    { title: 'Vai trò', dataIndex: 'vaiTro', key: 'vaiTro', render: v => v === 'ADMIN' ? <Tag color="gold">ADMIN</Tag> : <Tag color="blue">TENANT</Tag> },
     {
       title: 'Thao tác', key: 'action',
       render: (_, r) => (
@@ -74,10 +77,10 @@ export default function TenantsPage() {
 
       <Modal title={editing ? 'Chỉnh sửa khách thuê' : 'Thêm khách thuê mới'} open={modalOpen} onCancel={closeModal} footer={null} destroyOnHidden>
         <Form form={form} layout="vertical" onFinish={onFinish} style={{ marginTop: 16 }}>
-          <Form.Item label="Họ tên" name="hoTen" rules={[{ required: true }]}><Input /></Form.Item>
-          <Form.Item label="Số điện thoại" name="soDienThoai" rules={[{ required: true }]}><Input /></Form.Item>
+          <Form.Item label="Họ tên" name="hoTen" rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}><Input /></Form.Item>
+          <Form.Item label="Số điện thoại" name="soDienThoai" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }, { pattern: /^(0|\+84)\d{9,10}$/, message: 'Số điện thoại không hợp lệ' }]}><Input /></Form.Item>
           <Form.Item label="Email" name="email"><Input /></Form.Item>
-          <Form.Item label="CCCD" name="cccd"><Input /></Form.Item>
+          <Form.Item label="CCCD" name="cccd" rules={[{ required: true, message: 'Vui lòng nhập số CCCD' }, { pattern: /^\d{9,12}$/, message: 'CCCD không hợp lệ (phải gồm 9-12 chữ số)' }]}><Input /></Form.Item>
           <Form.Item label="Quê quán" name="queQuan"><Input /></Form.Item>
           <Form.Item style={{ textAlign: 'right', marginBottom: 0 }}>
             <Space>

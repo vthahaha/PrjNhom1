@@ -30,7 +30,7 @@ export default function ContractsPage() {
 
   const { data: rooms } = useQuery({
     queryKey: ['rooms-select'],
-    queryFn: () => roomApi.getAll({ trangThai: 'TRONG' }).then(r => r.data),
+    queryFn: () => roomApi.getAll({ availableForContract: true }).then(r => r.data),
   })
 
   const { data: tenants } = useQuery({
@@ -166,12 +166,16 @@ export default function ContractsPage() {
         <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ marginTop: 16 }}>
           <Form.Item label="Phòng" name="phongId" rules={[{ required: true }]}>
             <Select 
-              placeholder="Chọn phòng còn trống" 
+              placeholder="Chọn phòng còn chỗ trống" 
               showSearch 
               optionFilterProp="children"
               onChange={handleRoomChange}
             >
-              {rooms?.map(r => <Option key={r.id} value={r.id}>{r.tenPhong} — {Number(r.giaThue).toLocaleString('vi-VN')} đ</Option>)}
+              {rooms?.map(r => (
+                <Option key={r.id} value={r.id}>
+                  {r.tenPhong} (Đang ở: {r.soNguoiDaO || 0}/{r.soNguoiToiDa || 2} người) — {Number(r.giaThue).toLocaleString('vi-VN')} đ
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 

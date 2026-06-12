@@ -26,6 +26,7 @@ public record InvoiceResponse(
     BigDecimal tienDichVu,
     Integer soNguoiO,
     Invoice.TrangThai trangThai,
+    Boolean daGui,
     LocalDateTime ngayThanhToan,
     LocalDateTime createdAt
 ) {}

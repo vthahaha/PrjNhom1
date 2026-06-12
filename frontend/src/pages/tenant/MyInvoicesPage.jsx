@@ -42,7 +42,14 @@ export default function MyInvoicesPage() {
         {selectedInvoice && (
           <Descriptions bordered column={1} size="small">
             <Descriptions.Item label="Phòng">{selectedInvoice.tenPhong}</Descriptions.Item>
-            <Descriptions.Item label="Tiền phòng">{Number(selectedInvoice.tienPhong || 0).toLocaleString('vi-VN')} đ</Descriptions.Item>
+            <Descriptions.Item label="Tiền phòng">
+              <div>
+                <b>{Number(selectedInvoice.tienPhong || 0).toLocaleString('vi-VN')} đ</b>
+                <span style={{ fontSize: 12, color: 'gray', marginLeft: 8 }}>
+                  (Chia đầu người: {Math.round((selectedInvoice.tienPhong || 0) / (selectedInvoice.soNguoiO || 1)).toLocaleString('vi-VN')} đ/người - {selectedInvoice.soNguoiO} người)
+                </span>
+              </div>
+            </Descriptions.Item>
             <Descriptions.Item label="Tiền điện">
               {Number(selectedInvoice.tienDien || 0).toLocaleString('vi-VN')} đ
               <br/>

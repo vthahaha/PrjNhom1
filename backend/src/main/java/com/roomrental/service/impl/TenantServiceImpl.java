@@ -45,10 +45,11 @@ public class TenantServiceImpl implements TenantService {
         // Mật khẩu tạm = 4 số cuối SĐT, tenant phải đổi khi đăng nhập lần đầu
         String tmpPassword = request.soDienThoai().substring(
                 Math.max(0, request.soDienThoai().length() - 4));
+        String email = (request.email() == null || request.email().isBlank()) ? null : request.email().trim();
         User user = User.builder()
                 .hoTen(request.hoTen())
                 .soDienThoai(request.soDienThoai())
-                .email(request.email())
+                .email(email)
                 .matKhau(passwordEncoder.encode(tmpPassword))
                 .vaiTro(User.VaiTro.TENANT)
                 .doiMkLanDau(true)
@@ -77,7 +78,8 @@ public class TenantServiceImpl implements TenantService {
                 });
         user.setHoTen(request.hoTen());
         user.setSoDienThoai(request.soDienThoai());
-        user.setEmail(request.email());
+        String email = (request.email() == null || request.email().isBlank()) ? null : request.email().trim();
+        user.setEmail(email);
         user.setCccd(request.cccd());
         user.setQueQuan(request.queQuan());
         return toResponse(userRepository.save(user));
@@ -115,7 +117,10 @@ public class TenantServiceImpl implements TenantService {
         User user = userRepository.findBySoDienThoai(soDienThoai)
                 .orElseThrow(() -> new ResourceNotFoundException("Người dùng không tồn tại"));
         if (request.hoTen() != null) user.setHoTen(request.hoTen());
-        if (request.email() != null) user.setEmail(request.email());
+        if (request.email() != null) {
+            String email = request.email().isBlank() ? null : request.email().trim();
+            user.setEmail(email);
+        }
         if (request.cccd() != null) user.setCccd(request.cccd());
         if (request.queQuan() != null) user.setQueQuan(request.queQuan());
         if (request.soDienThoai() != null && !request.soDienThoai().equals(soDienThoai)) {
@@ -141,9 +146,15 @@ public class TenantServiceImpl implements TenantService {
     private TenantResponse toResponse(User user) {
         boolean coHopDong = contractRepository.existsByKhachThueIdAndTrangThai(
                 user.getId(), Contract.TrangThai.HIEU_LUC);
+        java.util.Optional<Contract> activeContractOpt = contractRepository.findTopByKhachThueIdAndTrangThaiOrderByNgayBatDauDesc(
+                user.getId(), Contract.TrangThai.HIEU_LUC);
+        String tenPhong = activeContractOpt.map(c -> c.getRoom().getTenPhong()).orElse(null);
+        java.time.LocalDate ngayBatDauHopDong = activeContractOpt.map(Contract::getNgayBatDau).orElse(null);
+
         return new TenantResponse(user.getId(), user.getHoTen(), user.getSoDienThoai(),
                 user.getEmail(), user.getVaiTro(), user.isDoiMkLanDau(),
-                user.getCreatedAt(), coHopDong, user.getCccd(), user.getQueQuan());
+                user.getCreatedAt(), coHopDong, user.getCccd(), user.getQueQuan(),
+                tenPhong, ngayBatDauHopDong);
     }
 
     private ContractResponse toContractResponse(Contract c) {

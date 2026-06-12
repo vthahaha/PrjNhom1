@@ -47,11 +47,16 @@ public class ContractServiceImpl implements ContractService {
     public ContractResponse create(ContractRequest request) {
         Room room = roomRepository.findById(request.phongId())
                 .orElseThrow(() -> new ResourceNotFoundException("Phòng không tồn tại: " + request.phongId()));
-        if (room.getTrangThai() != Room.TrangThai.TRONG) {
-            throw new BadRequestException("Phòng hiện không trống, không thể tạo hợp đồng");
+        if (room.getTrangThai() == Room.TrangThai.DANG_SUA) {
+            throw new BadRequestException("Phòng đang sửa, không thể tạo hợp đồng");
         }
-        if (contractRepository.existsByRoomIdAndTrangThai(request.phongId(), Contract.TrangThai.HIEU_LUC)) {
-            throw new BadRequestException("Phòng đang có hợp đồng hiệu lực");
+        List<Contract> activeContracts = contractRepository.findByRoomIdAndTrangThai(request.phongId(), Contract.TrangThai.HIEU_LUC);
+        int currentOccupants = activeContracts.stream().mapToInt(Contract::getSoNguoiO).sum();
+        int newOccupants = request.soNguoiO() != null ? request.soNguoiO() : 1;
+        int maxOccupants = room.getSoNguoiToiDa() != null ? room.getSoNguoiToiDa() : 2;
+
+        if (currentOccupants + newOccupants > maxOccupants) {
+            throw new BadRequestException("Phòng không đủ chỗ cho số người đăng ký mới (Hiện tại: " + currentOccupants + "/" + maxOccupants + " người)");
         }
         if (contractRepository.existsByKhachThueIdAndTrangThai(request.khachThueId(), Contract.TrangThai.HIEU_LUC)) {
             throw new BadRequestException("Khách thuê này đang có hợp đồng hiệu lực ở một phòng khác");
@@ -99,9 +104,15 @@ public class ContractServiceImpl implements ContractService {
         contract.setTrangThai(Contract.TrangThai.CHAM_DUT);
         contract.setLyDoChamDut(request.lyDoChamDut());
         contract.setNgayTraPhong(request.ngayTraPhong());
-        // Cập nhật phòng về trạng thái trống
+        // Cập nhật phòng về trạng thái trống nếu không còn hợp đồng hiệu lực nào khác
         Room room = contract.getRoom();
-        room.setTrangThai(Room.TrangThai.TRONG);
+        List<Contract> otherActive = contractRepository.findByRoomIdAndTrangThai(room.getId(), Contract.TrangThai.HIEU_LUC);
+        long remainingActiveCount = otherActive.stream().filter(c -> !c.getId().equals(id)).count();
+        if (remainingActiveCount == 0) {
+            room.setTrangThai(Room.TrangThai.TRONG);
+        } else {
+            room.setTrangThai(Room.TrangThai.DA_THUE);
+        }
         roomRepository.save(room);
         return toResponse(contractRepository.save(contract));
     }

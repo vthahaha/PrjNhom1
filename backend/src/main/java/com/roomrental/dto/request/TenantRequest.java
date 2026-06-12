@@ -17,6 +17,9 @@ public record TenantRequest(
     @Email(message = "Email không hợp lệ")
     String email,
     
+    @NotBlank(message = "CCCD không được để trống")
+    @Pattern(regexp = "^\\d{9,12}$", message = "CCCD không hợp lệ (phải gồm 9-12 chữ số)")
     String cccd,
+
     String queQuan
 ) {}

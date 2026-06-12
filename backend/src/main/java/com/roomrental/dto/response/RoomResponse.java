@@ -13,5 +13,12 @@ public record RoomResponse(
     String tienNghi,
     BigDecimal giaThue,
     Room.TrangThai trangThai,
-    LocalDateTime createdAt
-) {}
+    LocalDateTime createdAt,
+    Integer soNguoiDaO
+) {
+    public RoomResponse(Long id, String tenPhong, BigDecimal dienTich,
+                        Integer soNguoiToiDa, String tienNghi, BigDecimal giaThue,
+                        Room.TrangThai trangThai, LocalDateTime createdAt) {
+        this(id, tenPhong, dienTich, soNguoiToiDa, tienNghi, giaThue, trangThai, createdAt, 0);
+    }
+}

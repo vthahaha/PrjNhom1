@@ -81,6 +81,7 @@ public class ServiceServiceImpl implements ServiceService {
         Room room = findRoom(roomId);
         // Xóa hết gán cũ, thêm lại toàn bộ
         roomServiceRepository.deleteByRoomId(roomId);
+        roomServiceRepository.flush(); // Bắt buộc flush để xóa bản ghi cũ trước khi chèn bản ghi mới
         List<RoomService> saved = request.items().stream().map(item -> {
             Service svc = findService(item.dichVuId());
             return roomServiceRepository.save(RoomService.builder()
