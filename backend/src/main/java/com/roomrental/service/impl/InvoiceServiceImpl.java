@@ -314,6 +314,26 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .subtract(nvl(tienNuoc))
                 .subtract(nvl(i.getPhiKhac()));
 
+        // Resolve service details
+        List<InvoiceResponse.DichVuHoaDon> chiTietDichVu = new java.util.ArrayList<>();
+        List<com.roomrental.entity.RoomService> roomServices = roomServiceRepository.findByRoomId(i.getHopDong().getRoom().getId());
+        for (com.roomrental.entity.RoomService rs : roomServices) {
+            BigDecimal price = rs.getDonGiaOverride() != null ? rs.getDonGiaOverride() : rs.getService().getDonGiaMacDinh();
+            String donVi = rs.getService().getDonVi();
+            BigDecimal subtotal;
+            if (donVi != null && donVi.toLowerCase().contains("người")) {
+                subtotal = price.multiply(BigDecimal.valueOf(i.getHopDong().getSoNguoiO()));
+            } else {
+                subtotal = price;
+            }
+            chiTietDichVu.add(new InvoiceResponse.DichVuHoaDon(
+                rs.getService().getTenDichVu(),
+                price,
+                donVi,
+                subtotal
+            ));
+        }
+
         return new InvoiceResponse(
                 i.getId(),
                 i.getHopDong().getId(),
@@ -327,6 +347,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 i.getTongTien(), tienPhong, tienDien, tienNuoc, tienDichVu,
                 i.getHopDong().getSoNguoiO(), i.getTrangThai(),
                 i.getDaGui(),
-                i.getNgayThanhToan(), i.getCreatedAt());
+                i.getNgayThanhToan(), i.getCreatedAt(),
+                chiTietDichVu);
     }
 }

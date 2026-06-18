@@ -62,19 +62,27 @@ public class TenantController {
         return ResponseEntity.ok(tenantService.getContractHistory(id));
     }
 
-    // -------- TENANT: /api/me --------
+    // -------- ME: /api/me --------
 
     @GetMapping("/api/me")
-    @PreAuthorize("hasRole('TENANT')")
+    @PreAuthorize("hasAnyRole('TENANT', 'ADMIN')")
     public ResponseEntity<TenantResponse> getMe(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(tenantService.getMe(userDetails.getUsername()));
     }
 
     @PutMapping("/api/me")
-    @PreAuthorize("hasRole('TENANT')")
+    @PreAuthorize("hasAnyRole('TENANT', 'ADMIN')")
     public ResponseEntity<TenantResponse> updateMe(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody UpdateMeRequest request) {
         return ResponseEntity.ok(tenantService.updateMe(userDetails.getUsername(), request));
+    }
+
+    @PostMapping("/api/me/avatar")
+    @PreAuthorize("hasAnyRole('TENANT', 'ADMIN')")
+    public ResponseEntity<TenantResponse> updateAvatar(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        return ResponseEntity.ok(tenantService.updateAvatar(userDetails.getUsername(), file));
     }
 }

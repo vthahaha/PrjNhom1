@@ -9,10 +9,11 @@ public record AuthResponse(
     String hoTen,
     String soDienThoai,
     User.VaiTro vaiTro,
-    boolean doiMkLanDau
+    boolean doiMkLanDau,
+    String avatarUrl
 ) {
     public AuthResponse(String token, Long id, String hoTen, String soDienThoai,
-                        User.VaiTro vaiTro, boolean doiMkLanDau) {
-        this(token, "Bearer", id, hoTen, soDienThoai, vaiTro, doiMkLanDau);
+                        User.VaiTro vaiTro, boolean doiMkLanDau, String avatarUrl) {
+        this(token, "Bearer", id, hoTen, soDienThoai, vaiTro, doiMkLanDau, avatarUrl);
     }
 }

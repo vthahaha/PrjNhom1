@@ -44,6 +44,9 @@ public class User {
     @Column(name = "doi_mk_lan_dau", nullable = false)
     private boolean doiMkLanDau = true;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

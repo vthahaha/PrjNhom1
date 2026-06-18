@@ -83,6 +83,7 @@ public class ContractServiceImpl implements ContractService {
                 .soNguoiO(request.soNguoiO() != null ? request.soNguoiO() : 1)
                 .trangThai(Contract.TrangThai.HIEU_LUC)
                 .dichVu(selectedServices)
+                .kyDongTien(request.kyDongTien())
                 .build();
         room.setTrangThai(Room.TrangThai.DA_THUE);
         roomRepository.save(room);
@@ -198,6 +199,7 @@ public class ContractServiceImpl implements ContractService {
                 c.getTrangThai(), c.getSoNguoiO(), c.getLyDoChamDut(), c.getNgayTraPhong(),
                 c.getCreatedAt(), c.getRoom().getTienNghi(),
                 fileStorageService.getPresignedUrl(c.getFileHopDongUrl()),
+                c.getKyDongTien(),
                 dichVuInfos);
     }
 }

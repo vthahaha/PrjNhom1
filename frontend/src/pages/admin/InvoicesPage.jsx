@@ -109,7 +109,20 @@ export default function InvoicesPage() {
               <br/>
               <span style={{ fontSize: 12, color: 'gray' }}>(Chỉ số: {selectedInvoice.chiSoNuocDau} - {selectedInvoice.chiSoNuocCuoi})</span>
             </Descriptions.Item>
-            <Descriptions.Item label="Tiền dịch vụ">{Number(selectedInvoice.tienDichVu || 0).toLocaleString('vi-VN')} đ</Descriptions.Item>
+            <Descriptions.Item label="Tiền dịch vụ">
+              <div>
+                <b>{Number(selectedInvoice.tienDichVu || 0).toLocaleString('vi-VN')} đ</b>
+                {selectedInvoice.chiTietDichVu && selectedInvoice.chiTietDichVu.length > 0 && (
+                  <div style={{ marginTop: 8, paddingLeft: 8, borderLeft: '2px solid #d9d9d9', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {selectedInvoice.chiTietDichVu.map((dv, idx) => (
+                      <div key={idx} style={{ fontSize: 12, color: 'gray' }}>
+                        • {dv.tenDichVu}: <b>{Number(dv.thanhTien).toLocaleString('vi-VN')} đ</b> ({Number(dv.donGia).toLocaleString('vi-VN')} đ/{dv.donVi})
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Descriptions.Item>
             {selectedInvoice.phiKhac > 0 && (
               <Descriptions.Item label="Phụ phí">
                 {Number(selectedInvoice.phiKhac).toLocaleString('vi-VN')} đ 

@@ -10,6 +10,8 @@ import com.roomrental.repository.ContractRepository;
 import com.roomrental.repository.RoomRepository;
 import com.roomrental.service.RoomService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,16 +25,14 @@ public class RoomServiceImpl implements RoomService {
     private final ContractRepository contractRepository;
 
     @Override
+    @Cacheable(value = "rooms", key = "{#search, #trangThai, #availableForContract}")
     public List<RoomResponse> getAll(String search, Room.TrangThai trangThai, Boolean availableForContract) {
         List<Room> rooms = roomRepository.findByFilter(search, trangThai);
         if (Boolean.TRUE.equals(availableForContract)) {
             return rooms.stream()
-                    .filter(r -> r.getTrangThai() != Room.TrangThai.DANG_SUA)
+                    .filter(r -> r.getTrangThai() == Room.TrangThai.TRONG)
                     .map(this::toResponse)
-                    .filter(res -> {
-                        int maxOccupants = res.soNguoiToiDa() != null ? res.soNguoiToiDa() : 2;
-                        return res.soNguoiDaO() < maxOccupants;
-                    })
+                    .filter(res -> res.soNguoiDaO() == 0)
                     .toList();
         }
         return rooms.stream().map(this::toResponse).toList();
@@ -40,6 +40,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "rooms", allEntries = true)
     public RoomResponse create(RoomRequest request) {
         Room room = Room.builder()
                 .tenPhong(request.tenPhong())
@@ -52,12 +53,14 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Cacheable(value = "rooms", key = "#id")
     public RoomResponse getById(Long id) {
         return toResponse(findRoom(id));
     }
 
     @Override
     @Transactional
+    @CacheEvict(value = "rooms", allEntries = true)
     public RoomResponse update(Long id, RoomRequest request) {
         Room room = findRoom(id);
         room.setTenPhong(request.tenPhong());
@@ -70,6 +73,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "rooms", allEntries = true)
     public void delete(Long id) {
         findRoom(id);
         if (contractRepository.existsByRoomIdAndTrangThai(id, Contract.TrangThai.HIEU_LUC)) {
@@ -80,6 +84,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "rooms", allEntries = true)
     public RoomResponse updateStatus(Long id, Room.TrangThai trangThai) {
         Room room = findRoom(id);
         room.setTrangThai(trangThai);

@@ -15,6 +15,8 @@ import com.roomrental.repository.ServiceRepository;
 import com.roomrental.service.ServiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,12 +30,14 @@ public class ServiceServiceImpl implements ServiceService {
     private final RoomRepository roomRepository;
 
     @Override
+    @Cacheable(value = "services")
     public List<ServiceResponse> getAll() {
         return serviceRepository.findAll().stream().map(this::toServiceResponse).toList();
     }
 
     @Override
     @Transactional
+    @CacheEvict(value = "services", allEntries = true)
     public ServiceResponse create(ServiceRequest request) {
         if (serviceRepository.existsByTenDichVu(request.tenDichVu())) {
             throw new BadRequestException("Tên dịch vụ đã tồn tại: " + request.tenDichVu());
@@ -48,6 +52,7 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"services", "room-services"}, allEntries = true)
     public ServiceResponse update(Long id, ServiceRequest request) {
         Service svc = findService(id);
         // Kiểm tra trùng tên (ngoại trừ chính nó)
@@ -63,12 +68,14 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     @Transactional
+    @CacheEvict(value = {"services", "room-services"}, allEntries = true)
     public void delete(Long id) {
         findService(id);
         serviceRepository.deleteById(id);
     }
 
     @Override
+    @Cacheable(value = "room-services", key = "#roomId")
     public List<RoomServiceResponse> getRoomServices(Long roomId) {
         findRoom(roomId);
         return roomServiceRepository.findByRoomId(roomId)
@@ -77,6 +84,7 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "room-services", key = "#roomId")
     public List<RoomServiceResponse> updateRoomServices(Long roomId, RoomServiceRequest request) {
         Room room = findRoom(roomId);
         // Xóa hết gán cũ, thêm lại toàn bộ

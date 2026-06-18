@@ -7,9 +7,11 @@ import com.roomrental.entity.RepairRequest;
 import com.roomrental.entity.User;
 import com.roomrental.exception.BadRequestException;
 import com.roomrental.exception.ResourceNotFoundException;
+import com.roomrental.entity.Notification;
 import com.roomrental.repository.ContractRepository;
 import com.roomrental.repository.RepairRequestRepository;
 import com.roomrental.repository.UserRepository;
+import com.roomrental.repository.NotificationRepository;
 import com.roomrental.service.RepairRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class RepairRequestServiceImpl implements RepairRequestService {
     private final RepairRequestRepository repairRequestRepository;
     private final ContractRepository contractRepository;
     private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
 
     @Override
     @Transactional
@@ -45,7 +48,19 @@ public class RepairRequestServiceImpl implements RepairRequestService {
                 .csvcHieuHong(csvc)
                 .trangThai(RepairRequest.TrangThai.CHO_XU_LY)
                 .build();
-        return toResponse(repairRequestRepository.save(rr));
+        RepairRequest saved = repairRequestRepository.save(rr);
+
+        // Tạo thông báo cho admin
+        String msg = String.format("Khách thuê %s (Phòng %s) gửi yêu cầu sửa chữa: %s",
+                user.getHoTen(), contract.getRoom().getTenPhong(), moTa);
+        Notification notification = Notification.builder()
+                .noiDung(msg)
+                .daDoc(false)
+                .forAdmin(true)
+                .build();
+        notificationRepository.save(notification);
+
+        return toResponse(saved);
     }
 
     @Override

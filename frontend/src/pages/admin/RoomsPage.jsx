@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   Table, Button, Tag, Input, Select, Space, Modal, Form,
-  InputNumber, Typography, App, Popconfirm, Checkbox
+  InputNumber, Typography, App, Popconfirm, Checkbox, Row, Col
 } from 'antd'
 import { PlusOutlined, SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -221,71 +221,80 @@ export default function RoomsPage() {
         onCancel={closeModal}
         footer={null}
         destroyOnHidden
+        width={800}
       >
         <Form form={form} layout="vertical" onFinish={onFinish} style={{ marginTop: 16 }}>
-          <Form.Item label="Tên phòng" name="tenPhong" rules={[{ required: true, message: 'Vui lòng nhập tên phòng' }]}>
-            <Input placeholder="VD: Phòng 101" />
-          </Form.Item>
-          <Form.Item label="Giá thuê (đ/tháng)" name="giaThue" rules={[{ required: true, message: 'Vui lòng nhập giá thuê' }]}>
-            <InputNumber style={{ width: '100%' }} min={0} step={100000} formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} />
-          </Form.Item>
-          <Form.Item label="Diện tích (m²)" name="dienTich">
-            <InputNumber style={{ width: '100%' }} min={0} step={0.5} />
-          </Form.Item>
-          <Form.Item label="Số người tối đa" name="soNguoiToiDa">
-            <InputNumber style={{ width: '100%' }} placeholder="Không giới hạn" />
-          </Form.Item>
-          <Form.Item label="Tiện nghi" name="tienNghi">
-            <Select 
-              mode="tags" 
-              placeholder="Chọn hoặc nhập tiện nghi (VD: Điều hòa, Máy giặt...)"
-              options={COMMON_FACILITIES.map(f => ({ label: f, value: f }))}
-            />
-          </Form.Item>
+          <Row gutter={24}>
+            <Col xs={24} md={12}>
+              <Form.Item label="Tên phòng" name="tenPhong" rules={[{ required: true, message: 'Vui lòng nhập tên phòng' }]}>
+                <Input placeholder="VD: Phòng 101" />
+              </Form.Item>
+              <Form.Item label="Giá thuê (đ/tháng)" name="giaThue" rules={[{ required: true, message: 'Vui lòng nhập giá thuê' }]}>
+                <InputNumber style={{ width: '100%' }} min={0} step={100000} formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} />
+              </Form.Item>
+              <Form.Item label="Diện tích (m²)" name="dienTich">
+                <InputNumber style={{ width: '100%' }} min={0} step={0.5} />
+              </Form.Item>
+              <Form.Item label="Số người tối đa" name="soNguoiToiDa">
+                <InputNumber style={{ width: '100%' }} placeholder="Không giới hạn" />
+              </Form.Item>
+            </Col>
 
-          <Typography.Title level={5} style={{ marginTop: 16, marginBottom: 8 }}>Dịch vụ gán kèm</Typography.Title>
-          <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid #d9d9d9', borderRadius: 8, padding: '8px 12px', marginBottom: 16, background: '#fafafa' }}>
-            {allServices?.map(svc => (
-              <div key={svc.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <Form.Item
-                  name={['services', svc.id, 'checked']}
-                  valuePropName="checked"
-                  style={{ marginBottom: 0 }}
-                >
-                  <Checkbox>
-                    <span style={{ fontWeight: 500 }}>{svc.tenDichVu}</span>
-                    <Typography.Text type="secondary" style={{ marginLeft: 8, fontSize: 12 }}>
-                      ({Number(svc.donGiaMacDinh).toLocaleString('vi-VN')} đ/{svc.donVi})
-                    </Typography.Text>
-                  </Checkbox>
-                </Form.Item>
-                
-                <Form.Item
-                  noStyle
-                  shouldUpdate={(prev, curr) => prev?.services?.[svc.id]?.checked !== curr?.services?.[svc.id]?.checked}
-                >
-                  {({ getFieldValue }) => {
-                    const isChecked = getFieldValue(['services', svc.id, 'checked'])
-                    return isChecked ? (
-                      <Form.Item
-                        name={['services', svc.id, 'donGiaOverride']}
-                        style={{ marginBottom: 0 }}
-                      >
-                        <InputNumber
-                          placeholder="Giá riêng (nếu có)"
-                          style={{ width: 160 }}
-                          min={0}
-                          addonAfter="đ"
-                          formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                          parser={(v) => v.replace(/\$\s?|(,*)/g, '')}
-                        />
-                      </Form.Item>
-                    ) : null
-                  }}
-                </Form.Item>
+            <Col xs={24} md={12}>
+              <Form.Item label="Tiện nghi" name="tienNghi">
+                <Select 
+                  mode="tags" 
+                  placeholder="Chọn hoặc nhập tiện nghi (VD: Điều hòa, Máy giặt...)"
+                  options={COMMON_FACILITIES.map(f => ({ label: f, value: f }))}
+                />
+              </Form.Item>
+
+              <Typography.Title level={5} style={{ marginTop: 16, marginBottom: 8 }}>Dịch vụ gán kèm</Typography.Title>
+              <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid #d9d9d9', borderRadius: 8, padding: '8px 12px', marginBottom: 16, background: '#fafafa' }}>
+                {allServices?.map(svc => (
+                  <div key={svc.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <Form.Item
+                      name={['services', svc.id, 'checked']}
+                      valuePropName="checked"
+                      style={{ marginBottom: 0 }}
+                    >
+                      <Checkbox>
+                        <span style={{ fontWeight: 500 }}>{svc.tenDichVu}</span>
+                        <Typography.Text type="secondary" style={{ marginLeft: 8, fontSize: 12 }}>
+                          ({Number(svc.donGiaMacDinh).toLocaleString('vi-VN')} đ/{svc.donVi})
+                        </Typography.Text>
+                      </Checkbox>
+                    </Form.Item>
+                    
+                    <Form.Item
+                      noStyle
+                      shouldUpdate={(prev, curr) => prev?.services?.[svc.id]?.checked !== curr?.services?.[svc.id]?.checked}
+                    >
+                      {({ getFieldValue }) => {
+                        const isChecked = getFieldValue(['services', svc.id, 'checked'])
+                        return isChecked ? (
+                          <Form.Item
+                            name={['services', svc.id, 'donGiaOverride']}
+                            style={{ marginBottom: 0 }}
+                          >
+                            <InputNumber
+                              placeholder="Giá riêng (nếu có)"
+                              style={{ width: 160 }}
+                              min={0}
+                              addonAfter="đ"
+                              formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                              parser={(v) => v.replace(/\$\s?|(,*)/g, '')}
+                            />
+                          </Form.Item>
+                        ) : null
+                      }}
+                    </Form.Item>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </Col>
+          </Row>
+
           <Form.Item style={{ textAlign: 'right', marginBottom: 0 }}>
             <Space>
               <Button onClick={closeModal}>Hủy</Button>

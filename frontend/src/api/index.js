@@ -36,6 +36,9 @@ export const tenantApi = {
   getContracts: (id) => api.get(`/tenants/${id}/contracts`),
   getMe: () => api.get('/me'),
   updateMe: (data) => api.put('/me', data),
+  updateAvatar: (formData) => api.post('/me/avatar', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
 }
 
 // ── CONTRACTS ─────────────────────────────────────────────
@@ -51,6 +54,11 @@ export const contractApi = {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   deleteDocument: (id) => api.delete(`/contracts/${id}/upload-document`),
+  createExtensionRequest: (data) => api.post('/contracts/extensions', data),
+  getMyExtensionRequests: () => api.get('/contracts/extensions/my'),
+  getAllExtensionRequests: () => api.get('/contracts/extensions'),
+  approveExtensionRequest: (id) => api.patch(`/contracts/extensions/${id}/approve`),
+  rejectExtensionRequest: (id) => api.patch(`/contracts/extensions/${id}/reject`),
 }
 
 // ── INVOICES ──────────────────────────────────────────────
@@ -97,4 +105,14 @@ export const dashboardApi = {
 export const publicApi = {
   getRooms: () => api.get('/public/rooms'),
   getRoomById: (id) => api.get(`/public/rooms/${id}`),
+}
+
+// ── NOTIFICATIONS ─────────────────────────────────────────
+export const notificationApi = {
+  getAdminNotifications: () => api.get('/notifications/admin'),
+  getTenantNotifications: () => api.get('/notifications/tenant'),
+  markAsRead: (id) => api.patch(`/notifications/${id}/read`),
+  markAllAdminAsRead: () => api.post('/notifications/admin/read-all'),
+  getUnreadAdminCount: () => api.get('/notifications/admin/unread-count'),
+  getUnreadTenantCount: () => api.get('/notifications/tenant/unread-count'),
 }

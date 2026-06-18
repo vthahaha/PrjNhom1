@@ -118,28 +118,24 @@ export default function DashboardPage() {
 
         <Col xs={24} md={8}>
           <Card title="Thu & Chi" style={{ height: '100%' }}>
-            <Row>
-              <Col span={12}>
-                <Statistic
-                  title="Tổng thu"
-                  value={financeStats?.tongThu ?? 0}
-                  prefix={<RiseOutlined />}
-                  formatter={(v) => v.toLocaleString('vi-VN')}
-                  valueStyle={{ color: '#52c41a' }}
-                  suffix="₫"
-                />
-              </Col>
-              <Col span={12}>
-                <Statistic
-                  title="Tổng chi"
-                  value={financeStats?.tongChi ?? 0}
-                  prefix={<FallOutlined />}
-                  formatter={(v) => v.toLocaleString('vi-VN')}
-                  valueStyle={{ color: '#ff4d4f' }}
-                  suffix="₫"
-                />
-              </Col>
-            </Row>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <Statistic
+                title="Tổng thu"
+                value={financeStats?.tongThu ?? 0}
+                prefix={<RiseOutlined />}
+                formatter={(v) => v.toLocaleString('vi-VN')}
+                valueStyle={{ color: '#52c41a' }}
+                suffix="₫"
+              />
+              <Statistic
+                title="Tổng chi"
+                value={financeStats?.tongChi ?? 0}
+                prefix={<FallOutlined />}
+                formatter={(v) => v.toLocaleString('vi-VN')}
+                valueStyle={{ color: '#ff4d4f' }}
+                suffix="₫"
+              />
+            </div>
           </Card>
         </Col>
 

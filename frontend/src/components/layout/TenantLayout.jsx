@@ -81,7 +81,7 @@ export default function TenantLayout() {
             placement="bottomRight"
           >
             <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Avatar icon={<UserOutlined />} />
+              <Avatar src={user?.avatarUrl} icon={<UserOutlined />} />
               <Text>{user?.hoTen}</Text>
             </div>
           </Dropdown>

@@ -20,12 +20,21 @@ export function AuthProvider({ children }) {
     setUser(null)
   }, [])
 
+  const updateUser = useCallback((newFields) => {
+    setUser((prev) => {
+      if (!prev) return null;
+      const updated = { ...prev, ...newFields };
+      localStorage.setItem('user', JSON.stringify(updated));
+      return updated;
+    });
+  }, [])
+
   const isAdmin = user?.vaiTro === 'ADMIN'
   const isTenant = user?.vaiTro === 'TENANT'
   const needsPasswordChange = user?.doiMkLanDau === true
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAdmin, isTenant, needsPasswordChange }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser, isAdmin, isTenant, needsPasswordChange }}>
       {children}
     </AuthContext.Provider>
   )

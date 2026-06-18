@@ -28,5 +28,13 @@ public record InvoiceResponse(
     Invoice.TrangThai trangThai,
     Boolean daGui,
     LocalDateTime ngayThanhToan,
-    LocalDateTime createdAt
-) {}
+    LocalDateTime createdAt,
+    java.util.List<DichVuHoaDon> chiTietDichVu
+) {
+    public record DichVuHoaDon(
+        String tenDichVu,
+        BigDecimal donGia,
+        String donVi,
+        BigDecimal thanhTien
+    ) {}
+}

@@ -132,6 +132,25 @@ public class TenantServiceImpl implements TenantService {
         return toResponse(userRepository.save(user));
     }
 
+    @Override
+    @Transactional
+    public TenantResponse updateAvatar(String soDienThoai, org.springframework.web.multipart.MultipartFile file) {
+        User user = userRepository.findBySoDienThoai(soDienThoai)
+                .orElseThrow(() -> new ResourceNotFoundException("Người dùng không tồn tại"));
+
+        if (user.getAvatarUrl() != null && !user.getAvatarUrl().isBlank()) {
+            try {
+                fileStorageService.deleteFile(user.getAvatarUrl());
+            } catch (Exception e) {
+                // Ignore delete error if file not found or minio offline
+            }
+        }
+
+        String fileName = fileStorageService.uploadFile(file);
+        user.setAvatarUrl(fileName);
+        return toResponse(userRepository.save(user));
+    }
+
     // -------- helpers --------
 
     private User findTenant(Long id) {
@@ -154,7 +173,7 @@ public class TenantServiceImpl implements TenantService {
         return new TenantResponse(user.getId(), user.getHoTen(), user.getSoDienThoai(),
                 user.getEmail(), user.getVaiTro(), user.isDoiMkLanDau(),
                 user.getCreatedAt(), coHopDong, user.getCccd(), user.getQueQuan(),
-                tenPhong, ngayBatDauHopDong);
+                tenPhong, ngayBatDauHopDong, fileStorageService.getPresignedUrl(user.getAvatarUrl()));
     }
 
     private ContractResponse toContractResponse(Contract c) {
@@ -171,6 +190,7 @@ public class TenantServiceImpl implements TenantService {
                 c.getTrangThai(), c.getSoNguoiO(), c.getLyDoChamDut(), c.getNgayTraPhong(),
                 c.getCreatedAt(), c.getRoom().getTienNghi(),
                 fileStorageService.getPresignedUrl(c.getFileHopDongUrl()),
+                c.getKyDongTien(),
                 dichVuInfos);
     }
 }

@@ -11,6 +11,7 @@ import com.roomrental.repository.UserRepository;
 import com.roomrental.security.JwtUtils;
 import com.roomrental.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import com.roomrental.service.FileStorageService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +26,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
+    private final FileStorageService fileStorageService;
 
     @Override
     @Transactional
@@ -55,7 +57,8 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtUtils.generateToken(user.getSoDienThoai());
         return new AuthResponse(token, user.getId(), user.getHoTen(),
-                user.getSoDienThoai(), user.getVaiTro(), user.isDoiMkLanDau());
+                user.getSoDienThoai(), user.getVaiTro(), user.isDoiMkLanDau(),
+                fileStorageService.getPresignedUrl(user.getAvatarUrl()));
     }
 
     @Override

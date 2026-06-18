@@ -52,6 +52,16 @@ export default function TenantsPage() {
     { title: 'Số điện thoại', dataIndex: 'soDienThoai', key: 'soDienThoai', ...getColumnSearchProps('soDienThoai', 'số điện thoại') },
     { title: 'CCCD', dataIndex: 'cccd', key: 'cccd' },
     { title: 'Phòng', dataIndex: 'tenPhong', key: 'tenPhong', render: v => v ? <Tag color="purple">{v}</Tag> : <Text type="secondary">Chưa thuê</Text> },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'coHopDongHieuLuc',
+      key: 'coHopDongHieuLuc',
+      render: (coHopDong) => (
+        <Tag color={coHopDong ? 'green' : 'default'}>
+          {coHopDong ? 'Đang thuê' : 'Không thuê'}
+        </Tag>
+      )
+    },
     { title: 'Ngày ký HĐ', dataIndex: 'ngayBatDauHopDong', key: 'ngayBatDauHopDong', render: v => v ? dayjs(v).format('DD/MM/YYYY') : '—' },
     { title: 'Vai trò', dataIndex: 'vaiTro', key: 'vaiTro', render: v => v === 'ADMIN' ? <Tag color="gold">ADMIN</Tag> : <Tag color="blue">TENANT</Tag> },
     {

@@ -48,6 +48,9 @@ public class Contract {
     @Column(name = "so_nguoi_o", nullable = false)
     private Integer soNguoiO = 1;
 
+    @Column(name = "ky_dong_tien", nullable = false)
+    private Integer kyDongTien = 1;
+
     @Column(name = "ly_do_cham_dut", columnDefinition = "TEXT")
     private String lyDoChamDut;
 
@@ -85,6 +88,7 @@ public class Contract {
         private BigDecimal tienCoc = BigDecimal.ZERO;
         private TrangThai trangThai = TrangThai.HIEU_LUC;
         private Integer soNguoiO = 1;
+        private Integer kyDongTien = 1;
         private String lyDoChamDut;
         private LocalDate ngayTraPhong;
         private String fileHopDongUrl;
@@ -98,6 +102,7 @@ public class Contract {
         public ContractBuilder tienCoc(BigDecimal tienCoc) { this.tienCoc = tienCoc; return this; }
         public ContractBuilder trangThai(TrangThai trangThai) { this.trangThai = trangThai; return this; }
         public ContractBuilder soNguoiO(Integer soNguoiO) { this.soNguoiO = soNguoiO; return this; }
+        public ContractBuilder kyDongTien(Integer kyDongTien) { this.kyDongTien = kyDongTien; return this; }
         public ContractBuilder lyDoChamDut(String lyDoChamDut) { this.lyDoChamDut = lyDoChamDut; return this; }
         public ContractBuilder ngayTraPhong(LocalDate ngayTraPhong) { this.ngayTraPhong = ngayTraPhong; return this; }
         public ContractBuilder fileHopDongUrl(String fileHopDongUrl) { this.fileHopDongUrl = fileHopDongUrl; return this; }
@@ -113,6 +118,7 @@ public class Contract {
             c.tienCoc = tienCoc;
             c.trangThai = trangThai;
             c.soNguoiO = soNguoiO;
+            c.kyDongTien = kyDongTien;
             c.lyDoChamDut = lyDoChamDut;
             c.ngayTraPhong = ngayTraPhong;
             c.fileHopDongUrl = fileHopDongUrl;

@@ -16,5 +16,6 @@ public record TenantResponse(
     String cccd,
     String queQuan,
     String tenPhong,
-    java.time.LocalDate ngayBatDauHopDong
+    java.time.LocalDate ngayBatDauHopDong,
+    String avatarUrl
 ) {}

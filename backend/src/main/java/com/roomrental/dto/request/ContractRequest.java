@@ -29,6 +29,8 @@ public record ContractRequest(
     @Positive(message = "Số người ở phải lớn hơn 0")
     Integer soNguoiO,
 
+    Integer kyDongTien,
+
     /** Danh sách ID dịch vụ đăng ký theo hợp đồng (optional) */
     List<Long> dichVuIds
 ) {}

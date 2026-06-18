@@ -25,6 +25,7 @@ public record ContractResponse(
     LocalDateTime createdAt,
     String tienNghi,
     String fileHopDongUrl,
+    Integer kyDongTien,
     List<DichVuInfo> dichVu
 ) {
     public record DichVuInfo(Long id, String tenDichVu, java.math.BigDecimal donGiaMacDinh, String donVi) {}

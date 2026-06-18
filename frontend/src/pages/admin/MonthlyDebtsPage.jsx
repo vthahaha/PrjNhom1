@@ -94,27 +94,27 @@ export default function MonthlyDebtsPage() {
     { title: 'STT', key: 'stt', width: 60, align: 'center', render: (_, __, index) => index + 1 },
     { title: 'Phòng', dataIndex: 'tenPhong', key: 'tenPhong', width: 100, ...getColumnSearchProps('tenPhong', 'tên phòng') },
     { 
-      title: 'Điện (Chỉ số)', 
+      title: 'Số điện (kWh)', 
       key: 'dien', 
-      width: 140,
+      width: 130,
       render: (_, r) => (
-        <div>
-          <Text type="secondary">Cũ: </Text><b>{r.chiSoDienDau}</b><br/>
-          <Text type="secondary">Mới: </Text><b>{r.chiSoDienCuoi}</b><br/>
-          <Text type="warning" style={{ fontSize: 12 }}>(Tiêu thụ: {(r.chiSoDienCuoi - r.chiSoDienDau).toFixed(1)} kWh)</Text>
-        </div>
+        <Tooltip title={`Chỉ số cũ: ${r.chiSoDienDau} - Mới: ${r.chiSoDienCuoi}`}>
+          <span style={{ cursor: 'help', borderBottom: '1px dashed #d9d9d9' }}>
+            <Text strong>{(r.chiSoDienCuoi - r.chiSoDienDau).toFixed(1)}</Text> kWh
+          </span>
+        </Tooltip>
       ) 
     },
     { 
-      title: 'Nước (Chỉ số)', 
+      title: 'Số nước (m³)', 
       key: 'nuoc', 
-      width: 140,
+      width: 130,
       render: (_, r) => (
-        <div>
-          <Text type="secondary">Cũ: </Text><b>{r.chiSoNuocDau}</b><br/>
-          <Text type="secondary">Mới: </Text><b>{r.chiSoNuocCuoi}</b><br/>
-          <Text type="warning" style={{ fontSize: 12 }}>(Tiêu thụ: {(r.chiSoNuocCuoi - r.chiSoNuocDau).toFixed(1)} m³)</Text>
-        </div>
+        <Tooltip title={`Chỉ số cũ: ${r.chiSoNuocDau} - Mới: ${r.chiSoNuocCuoi}`}>
+          <span style={{ cursor: 'help', borderBottom: '1px dashed #d9d9d9' }}>
+            <Text strong>{(r.chiSoNuocCuoi - r.chiSoNuocDau).toFixed(1)}</Text> m³
+          </span>
+        </Tooltip>
       ) 
     },
     {

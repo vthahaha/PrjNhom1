@@ -105,6 +105,7 @@ public class DashboardServiceImpl implements DashboardService {
                 c.getTrangThai(), c.getSoNguoiO(), c.getLyDoChamDut(), c.getNgayTraPhong(),
                 c.getCreatedAt(), c.getRoom().getTienNghi(),
                 fileStorageService.getPresignedUrl(c.getFileHopDongUrl()),
+                c.getKyDongTien(),
                 dichVuInfos);
     }
 }

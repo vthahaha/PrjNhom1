@@ -16,4 +16,5 @@ public interface TenantService {
     List<ContractResponse> getContractHistory(Long id);
     TenantResponse getMe(String soDienThoai);
     TenantResponse updateMe(String soDienThoai, UpdateMeRequest request);
+    TenantResponse updateAvatar(String soDienThoai, org.springframework.web.multipart.MultipartFile file);
 }
