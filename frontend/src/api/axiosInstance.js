@@ -1,8 +1,11 @@
 import axios from 'axios'
 
 export const getBaseURL = () => {
-  const url = import.meta.env.VITE_API_URL
+  let url = import.meta.env.VITE_API_URL
   if (!url) return '/api'
+  if (url.endsWith('/')) {
+    url = url.slice(0, -1)
+  }
   return url.endsWith('/api') ? url : `${url}/api`
 }
 
