@@ -3,6 +3,7 @@ import { Form, Input, Button, Typography, App, Spin, Layout, Menu, Avatar, Uploa
 import { UserOutlined, UploadOutlined, SafetyOutlined, HomeOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { tenantApi, authApi } from '../../api'
+import { getAvatarUrl } from '../../api/axiosInstance'
 import { useAuth } from '../../store/AuthContext'
 
 const { Title, Text } = Typography
@@ -58,7 +59,7 @@ export default function AdminSettingsPage() {
           <div style={{ marginBottom: 16 }}>
             <Avatar
               size={120}
-              src={data?.avatarUrl}
+              src={getAvatarUrl(data?.avatarUrl)}
               icon={<UserOutlined />}
               style={{ border: '3px solid #1890ff', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
             />

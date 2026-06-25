@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons'
 import { useAuth } from '../../store/AuthContext'
 import { authApi, notificationApi } from '../../api'
+import { getAvatarUrl } from '../../api/axiosInstance'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
@@ -266,7 +267,7 @@ export default function AdminLayout() {
               placement="bottomRight"
             >
               <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Avatar src={user?.avatarUrl} icon={<UserOutlined />} style={{ background: token.colorPrimary }} />
+                <Avatar src={getAvatarUrl(user?.avatarUrl)} icon={<UserOutlined />} style={{ background: token.colorPrimary }} />
                 <Text>{user?.hoTen}</Text>
               </div>
             </Dropdown>

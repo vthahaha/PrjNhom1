@@ -30,6 +30,7 @@ spring:
             enable: true
 
 app:
+  backend-url: ${APP_BACKEND_URL:http://localhost:8083}
   jwt:
     # Secret phải là chuỗi Base64 encode của ít nhất 32 bytes (256 bit) để HMAC-SHA256 hoạt động.
     # Giá trị mặc định dưới đây là Base64 của: "RoomRental@2026!SecretKey#ForJWT_HmacSHA256_MustBe32BytesOrMore"

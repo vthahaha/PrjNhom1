@@ -9,6 +9,15 @@ export const getBaseURL = () => {
   return url.endsWith('/api') ? url : `${url}/api`
 }
 
+export const getAvatarUrl = (url) => {
+  if (!url) return null
+  const match = url.match(/\/public\/files\/(.+)$/)
+  if (match && match[1]) {
+    return `${getBaseURL()}/public/files/${match[1]}`
+  }
+  return url
+}
+
 const api = axios.create({
   baseURL: getBaseURL(),
   headers: { 'Content-Type': 'application/json' },
