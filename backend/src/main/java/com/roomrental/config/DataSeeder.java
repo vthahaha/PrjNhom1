@@ -98,7 +98,88 @@ public class DataSeeder implements ApplicationRunner {
                 .trangThai(Room.TrangThai.DANG_SUA)
                 .build();
             roomRepository.save(r3);
-            log.info("Seeded 3 default rooms");
+
+            Room r4 = Room.builder()
+                .tenPhong("Phòng 201")
+                .dienTich(new BigDecimal("28.0"))
+                .soNguoiToiDa(4)
+                .tienNghi("Điều hòa, Tủ lạnh, Máy giặt, Giường, Tủ quần áo")
+                .giaThue(new BigDecimal("4500000"))
+                .trangThai(Room.TrangThai.TRONG)
+                .build();
+            roomRepository.save(r4);
+
+            Room r5 = Room.builder()
+                .tenPhong("Phòng 202")
+                .dienTich(new BigDecimal("22.0"))
+                .soNguoiToiDa(2)
+                .tienNghi("Điều hòa, Giường, Tủ quần áo")
+                .giaThue(new BigDecimal("3200000"))
+                .trangThai(Room.TrangThai.TRONG)
+                .build();
+            roomRepository.save(r5);
+
+            Room r6 = Room.builder()
+                .tenPhong("Phòng 203")
+                .dienTich(new BigDecimal("20.0"))
+                .soNguoiToiDa(2)
+                .tienNghi("Điều hòa, Tủ lạnh")
+                .giaThue(new BigDecimal("3000000"))
+                .trangThai(Room.TrangThai.TRONG)
+                .build();
+            roomRepository.save(r6);
+
+            Room r7 = Room.builder()
+                .tenPhong("Phòng 301")
+                .dienTich(new BigDecimal("28.0"))
+                .soNguoiToiDa(4)
+                .tienNghi("Điều hòa, Máy giặt, Tủ lạnh, Giường")
+                .giaThue(new BigDecimal("4500000"))
+                .trangThai(Room.TrangThai.TRONG)
+                .build();
+            roomRepository.save(r7);
+
+            Room r8 = Room.builder()
+                .tenPhong("Phòng 302")
+                .dienTich(new BigDecimal("22.0"))
+                .soNguoiToiDa(2)
+                .tienNghi("Điều hòa, Tủ lạnh, Giường")
+                .giaThue(new BigDecimal("3200000"))
+                .trangThai(Room.TrangThai.TRONG)
+                .build();
+            roomRepository.save(r8);
+
+            Room r9 = Room.builder()
+                .tenPhong("Phòng 303")
+                .dienTich(new BigDecimal("20.0"))
+                .soNguoiToiDa(2)
+                .tienNghi("Điều hòa, Tủ lạnh, Giường, Tủ quần áo")
+                .giaThue(new BigDecimal("3000000"))
+                .trangThai(Room.TrangThai.TRONG)
+                .build();
+            roomRepository.save(r9);
+
+            Room r10 = Room.builder()
+                .tenPhong("Phòng 401")
+                .dienTich(new BigDecimal("35.0"))
+                .soNguoiToiDa(4)
+                .tienNghi("Điều hòa, Tủ lạnh, Máy giặt, Giường, Tủ quần áo, Sofa")
+                .giaThue(new BigDecimal("6000000"))
+                .trangThai(Room.TrangThai.TRONG)
+                .build();
+            roomRepository.save(r10);
+
+            Room r11 = Room.builder()
+                .tenPhong("Phòng 402")
+                .dienTich(new BigDecimal("20.0"))
+                .soNguoiToiDa(2)
+                .tienNghi("Điều hòa, Giường")
+                .giaThue(new BigDecimal("3000000"))
+                .trangThai(Room.TrangThai.DANG_SUA)
+                .build();
+            roomRepository.save(r11);
+
+            log.info("Seeded 11 default rooms");
         }
     }
 
@@ -139,7 +220,7 @@ public class DataSeeder implements ApplicationRunner {
         }
         if (userRepository.findBySoDienThoai("0987654321").isEmpty()) {
             User tenant = User.builder()
-                .hoTen("Nguyễn Văn A")
+                .hoTen("Nguyễn Minh Triết")
                 .soDienThoai("0987654321")
                 .email("tenant.a@gmail.com")
                 .matKhau(passwordEncoder.encode("password123"))
@@ -149,7 +230,63 @@ public class DataSeeder implements ApplicationRunner {
                 .queQuan("Hà Nội")
                 .build();
             userRepository.save(tenant);
-            log.info("Seeded Tenant user Nguyễn Văn A");
+            log.info("Seeded Tenant user Nguyễn Minh Triết");
+        }
+        if (userRepository.findBySoDienThoai("0911223344").isEmpty()) {
+            User tenant = User.builder()
+                .hoTen("Trần Thu Hà")
+                .soDienThoai("0911223344")
+                .email("tenant.b@gmail.com")
+                .matKhau(passwordEncoder.encode("password123"))
+                .vaiTro(User.VaiTro.TENANT)
+                .doiMkLanDau(false)
+                .cccd("123456789002")
+                .queQuan("Đà Nẵng")
+                .build();
+            userRepository.save(tenant);
+            log.info("Seeded Tenant user Trần Thu Hà");
+        }
+        if (userRepository.findBySoDienThoai("0922334455").isEmpty()) {
+            User tenant = User.builder()
+                .hoTen("Lê Quốc Anh")
+                .soDienThoai("0922334455")
+                .email("tenant.c@gmail.com")
+                .matKhau(passwordEncoder.encode("password123"))
+                .vaiTro(User.VaiTro.TENANT)
+                .doiMkLanDau(false)
+                .cccd("123456789003")
+                .queQuan("TP. Hồ Chí Minh")
+                .build();
+            userRepository.save(tenant);
+            log.info("Seeded Tenant user Lê Quốc Anh");
+        }
+        if (userRepository.findBySoDienThoai("0933445566").isEmpty()) {
+            User tenant = User.builder()
+                .hoTen("Phạm Hồng Đăng")
+                .soDienThoai("0933445566")
+                .email("tenant.d@gmail.com")
+                .matKhau(passwordEncoder.encode("password123"))
+                .vaiTro(User.VaiTro.TENANT)
+                .doiMkLanDau(false)
+                .cccd("123456789004")
+                .queQuan("Hải Phòng")
+                .build();
+            userRepository.save(tenant);
+            log.info("Seeded Tenant user Phạm Hồng Đăng");
+        }
+        if (userRepository.findBySoDienThoai("0944556677").isEmpty()) {
+            User tenant = User.builder()
+                .hoTen("Hoàng Mai Chi")
+                .soDienThoai("0944556677")
+                .email("tenant.e@gmail.com")
+                .matKhau(passwordEncoder.encode("password123"))
+                .vaiTro(User.VaiTro.TENANT)
+                .doiMkLanDau(false)
+                .cccd("123456789005")
+                .queQuan("Quảng Ninh")
+                .build();
+            userRepository.save(tenant);
+            log.info("Seeded Tenant user Hoàng Mai Chi");
         }
     }
 
@@ -166,7 +303,9 @@ public class DataSeeder implements ApplicationRunner {
             utilityPriceRepository.save(up);
         }
 
-        // --- SEED FOR TENANT 1 (0987654321) ON ROOM 101 ---
+        List<Service> services = serviceRepository.findAll();
+
+        // ─── SEED FOR TENANT 1 (Nguyễn Minh Triết) ON ROOM 101 ───
         User tenant1 = userRepository.findBySoDienThoai("0987654321").orElse(null);
         Room room101 = roomRepository.findAll().stream()
             .filter(r -> r.getTenPhong().equals("Phòng 101"))
@@ -177,7 +316,6 @@ public class DataSeeder implements ApplicationRunner {
             boolean hasContract101 = contractRepository.findAll().stream()
                 .anyMatch(c -> c.getKhachThue().getId().equals(tenant1.getId()) && c.getRoom().getId().equals(room101.getId()));
             if (!hasContract101) {
-                List<Service> services = serviceRepository.findAll();
                 Contract contract = Contract.builder()
                     .room(room101)
                     .khachThue(tenant1)
@@ -197,110 +335,15 @@ public class DataSeeder implements ApplicationRunner {
 
                 log.info("Seeded active contract for Room 101");
 
-                // Jan 2026 (Paid)
-                Invoice inv1 = Invoice.builder()
-                    .hopDong(contract)
-                    .utilityPrice(up)
-                    .thang(1).nam(2026)
-                    .chiSoDienDau(new BigDecimal("100"))
-                    .chiSoDienCuoi(new BigDecimal("220")) // 120 kWh = 420,000 đ
-                    .chiSoNuocDau(new BigDecimal("10"))
-                    .chiSoNuocCuoi(new BigDecimal("18")) // 8 m3 = 120,000 đ
-                    .phiKhac(BigDecimal.ZERO)
-                    .tongTien(new BigDecimal("3740000")) // Rent 3M + services 200k + utilities 540k
-                    .trangThai(Invoice.TrangThai.DA_TT)
-                    .daGui(true)
-                    .ngayThanhToan(LocalDateTime.of(2026, 1, 31, 20, 0))
-                    .build();
-                invoiceRepository.save(inv1);
+                // Seed Invoices for Room 101 (Jan to May paid, June unpaid)
+                seedInvoiceIfNotExist(contract, up, 1, 2026, new BigDecimal("100"), new BigDecimal("220"), new BigDecimal("10"), new BigDecimal("18"), true);
+                seedInvoiceIfNotExist(contract, up, 2, 2026, new BigDecimal("220"), new BigDecimal("350"), new BigDecimal("18"), new BigDecimal("25"), true);
+                seedInvoiceIfNotExist(contract, up, 3, 2026, new BigDecimal("350"), new BigDecimal("490"), new BigDecimal("25"), new BigDecimal("34"), true);
+                seedInvoiceIfNotExist(contract, up, 4, 2026, new BigDecimal("490"), new BigDecimal("610"), new BigDecimal("34"), new BigDecimal("42"), true);
+                seedInvoiceIfNotExist(contract, up, 5, 2026, new BigDecimal("610"), new BigDecimal("740"), new BigDecimal("42"), new BigDecimal("51"), true);
+                seedInvoiceIfNotExist(contract, up, 6, 2026, new BigDecimal("740"), new BigDecimal("740"), new BigDecimal("51"), new BigDecimal("51"), false);
 
-                // Feb 2026 (Paid)
-                Invoice inv2 = Invoice.builder()
-                    .hopDong(contract)
-                    .utilityPrice(up)
-                    .thang(2).nam(2026)
-                    .chiSoDienDau(new BigDecimal("220"))
-                    .chiSoDienCuoi(new BigDecimal("350")) // 130 kWh = 455,000 đ
-                    .chiSoNuocDau(new BigDecimal("18"))
-                    .chiSoNuocCuoi(new BigDecimal("25")) // 7 m3 = 105,000 đ
-                    .phiKhac(BigDecimal.ZERO)
-                    .tongTien(new BigDecimal("3760000")) // Rent 3M + services 200k + utilities 560k
-                    .trangThai(Invoice.TrangThai.DA_TT)
-                    .daGui(true)
-                    .ngayThanhToan(LocalDateTime.of(2026, 2, 28, 20, 0))
-                    .build();
-                invoiceRepository.save(inv2);
-
-                // Mar 2026 (Paid)
-                Invoice inv3 = Invoice.builder()
-                    .hopDong(contract)
-                    .utilityPrice(up)
-                    .thang(3).nam(2026)
-                    .chiSoDienDau(new BigDecimal("350"))
-                    .chiSoDienCuoi(new BigDecimal("490")) // 140 kWh = 490,000 đ
-                    .chiSoNuocDau(new BigDecimal("25"))
-                    .chiSoNuocCuoi(new BigDecimal("34")) // 9 m3 = 135,000 đ
-                    .phiKhac(BigDecimal.ZERO)
-                    .tongTien(new BigDecimal("3825000")) // Rent 3M + services 200k + utilities 625k
-                    .trangThai(Invoice.TrangThai.DA_TT)
-                    .daGui(true)
-                    .ngayThanhToan(LocalDateTime.of(2026, 3, 31, 20, 0))
-                    .build();
-                invoiceRepository.save(inv3);
-
-                // Apr 2026 (Paid)
-                Invoice inv4 = Invoice.builder()
-                    .hopDong(contract)
-                    .utilityPrice(up)
-                    .thang(4).nam(2026)
-                    .chiSoDienDau(new BigDecimal("490"))
-                    .chiSoDienCuoi(new BigDecimal("610")) // 120 kWh = 420,000 đ
-                    .chiSoNuocDau(new BigDecimal("34"))
-                    .chiSoNuocCuoi(new BigDecimal("42")) // 8 m3 = 120,000 đ
-                    .phiKhac(BigDecimal.ZERO)
-                    .tongTien(new BigDecimal("3740000"))
-                    .trangThai(Invoice.TrangThai.DA_TT)
-                    .daGui(true)
-                    .ngayThanhToan(LocalDateTime.of(2026, 4, 30, 20, 0))
-                    .build();
-                invoiceRepository.save(inv4);
-
-                // May 2026 (Paid)
-                Invoice inv5 = Invoice.builder()
-                    .hopDong(contract)
-                    .utilityPrice(up)
-                    .thang(5).nam(2026)
-                    .chiSoDienDau(new BigDecimal("610"))
-                    .chiSoDienCuoi(new BigDecimal("740")) // 130 kWh = 455,000 đ
-                    .chiSoNuocDau(new BigDecimal("42"))
-                    .chiSoNuocCuoi(new BigDecimal("51")) // 9 m3 = 135,000 đ
-                    .phiKhac(BigDecimal.ZERO)
-                    .tongTien(new BigDecimal("3790000"))
-                    .trangThai(Invoice.TrangThai.DA_TT)
-                    .daGui(true)
-                    .ngayThanhToan(LocalDateTime.of(2026, 5, 31, 20, 0))
-                    .build();
-                invoiceRepository.save(inv5);
-
-                // June 2026 (Unpaid)
-                Invoice inv6 = Invoice.builder()
-                    .hopDong(contract)
-                    .utilityPrice(up)
-                    .thang(6).nam(2026)
-                    .chiSoDienDau(new BigDecimal("740"))
-                    .chiSoDienCuoi(new BigDecimal("740"))
-                    .chiSoNuocDau(new BigDecimal("51"))
-                    .chiSoNuocCuoi(new BigDecimal("51"))
-                    .phiKhac(BigDecimal.ZERO)
-                    .tongTien(new BigDecimal("3200000"))
-                    .trangThai(Invoice.TrangThai.CHUA_TT)
-                    .daGui(true)
-                    .build();
-                invoiceRepository.save(inv6);
-
-                log.info("Seeded 6 monthly invoices (5 PAID, 1 UNPAID) for Room 101");
-
-                // Seed repair requests
+                // Seed completed repair requests
                 RepairRequest req1 = RepairRequest.builder()
                     .hopDong(contract)
                     .moTa("Hỏng bóng đèn vệ sinh")
@@ -321,27 +364,222 @@ public class DataSeeder implements ApplicationRunner {
                     .build();
                 repairRequestRepository.save(req2);
 
-                log.info("Seeded 2 completed repair requests for Room 101");
+                // Seed pending / ongoing repair requests for demo
+                RepairRequest req3 = RepairRequest.builder()
+                    .hopDong(contract)
+                    .moTa("Hỏng công tắc bình nóng lạnh, nước không ấm")
+                    .trangThai(RepairRequest.TrangThai.CHO_XU_LY)
+                    .ngayGui(LocalDateTime.of(2026, 6, 24, 15, 0))
+                    .build();
+                repairRequestRepository.save(req3);
+            }
+        }
+
+        // ─── SEED FOR TENANT 2 (Trần Thu Hà) ON ROOM 102 ───
+        User tenant2 = userRepository.findBySoDienThoai("0911223344").orElse(null);
+        Room room102 = roomRepository.findAll().stream()
+            .filter(r -> r.getTenPhong().equals("Phòng 102"))
+            .findFirst()
+            .orElse(null);
+
+        if (tenant2 != null && room102 != null) {
+            boolean hasContract102 = contractRepository.findAll().stream()
+                .anyMatch(c -> c.getKhachThue().getId().equals(tenant2.getId()) && c.getRoom().getId().equals(room102.getId()));
+            if (!hasContract102) {
+                Contract contract = Contract.builder()
+                    .room(room102)
+                    .khachThue(tenant2)
+                    .ngayBatDau(LocalDate.of(2026, 2, 1))
+                    .ngayKetThuc(LocalDate.of(2027, 1, 31))
+                    .giaThue(room102.getGiaThue())
+                    .tienCoc(room102.getGiaThue())
+                    .soNguoiO(2)
+                    .trangThai(Contract.TrangThai.HIEU_LUC)
+                    .dichVu(services)
+                    .kyDongTien(1)
+                    .build();
+                contractRepository.save(contract);
+                
+                room102.setTrangThai(Room.TrangThai.DA_THUE);
+                roomRepository.save(room102);
+
+                log.info("Seeded active contract for Room 102");
+
+                // Seed Invoices for Room 102 (Feb to May paid, June unpaid)
+                seedInvoiceIfNotExist(contract, up, 2, 2026, new BigDecimal("120"), new BigDecimal("250"), new BigDecimal("8"), new BigDecimal("17"), true);
+                seedInvoiceIfNotExist(contract, up, 3, 2026, new BigDecimal("250"), new BigDecimal("390"), new BigDecimal("17"), new BigDecimal("26"), true);
+                seedInvoiceIfNotExist(contract, up, 4, 2026, new BigDecimal("390"), new BigDecimal("520"), new BigDecimal("26"), new BigDecimal("34"), true);
+                seedInvoiceIfNotExist(contract, up, 5, 2026, new BigDecimal("520"), new BigDecimal("670"), new BigDecimal("34"), new BigDecimal("43"), true);
+                seedInvoiceIfNotExist(contract, up, 6, 2026, new BigDecimal("670"), new BigDecimal("670"), new BigDecimal("43"), new BigDecimal("43"), false);
+
+                // Seed pending repair request
+                RepairRequest req = RepairRequest.builder()
+                    .hopDong(contract)
+                    .moTa("Cửa sổ bị kẹt không đóng chặt được khi trời mưa")
+                    .trangThai(RepairRequest.TrangThai.DANG_XU_LY)
+                    .ngayGui(LocalDateTime.of(2026, 6, 23, 10, 30))
+                    .build();
+                repairRequestRepository.save(req);
+            }
+        }
+
+        // ─── SEED FOR TENANT 3 (Lê Quốc Anh) ON ROOM 202 ───
+        User tenant3 = userRepository.findBySoDienThoai("0922334455").orElse(null);
+        Room room202 = roomRepository.findAll().stream()
+            .filter(r -> r.getTenPhong().equals("Phòng 202"))
+            .findFirst()
+            .orElse(null);
+
+        if (tenant3 != null && room202 != null) {
+            boolean hasContract202 = contractRepository.findAll().stream()
+                .anyMatch(c -> c.getKhachThue().getId().equals(tenant3.getId()) && c.getRoom().getId().equals(room202.getId()));
+            if (!hasContract202) {
+                Contract contract = Contract.builder()
+                    .room(room202)
+                    .khachThue(tenant3)
+                    .ngayBatDau(LocalDate.of(2026, 3, 1))
+                    .ngayKetThuc(LocalDate.of(2027, 2, 28))
+                    .giaThue(room202.getGiaThue())
+                    .tienCoc(room202.getGiaThue())
+                    .soNguoiO(1)
+                    .trangThai(Contract.TrangThai.HIEU_LUC)
+                    .dichVu(services)
+                    .kyDongTien(1)
+                    .build();
+                contractRepository.save(contract);
+                
+                room202.setTrangThai(Room.TrangThai.DA_THUE);
+                roomRepository.save(room202);
+
+                log.info("Seeded active contract for Room 202");
+
+                // Seed Invoices (Mar to May paid, June unpaid)
+                seedInvoiceIfNotExist(contract, up, 3, 2026, new BigDecimal("80"), new BigDecimal("190"), new BigDecimal("5"), new BigDecimal("12"), true);
+                seedInvoiceIfNotExist(contract, up, 4, 2026, new BigDecimal("190"), new BigDecimal("310"), new BigDecimal("12"), new BigDecimal("20"), true);
+                seedInvoiceIfNotExist(contract, up, 5, 2026, new BigDecimal("310"), new BigDecimal("440"), new BigDecimal("20"), new BigDecimal("29"), true);
+                seedInvoiceIfNotExist(contract, up, 6, 2026, new BigDecimal("440"), new BigDecimal("440"), new BigDecimal("29"), new BigDecimal("29"), false);
+
+                // Seed pending repair request
+                RepairRequest req = RepairRequest.builder()
+                    .hopDong(contract)
+                    .moTa("Bồn cầu thoát nước rất chậm, có dấu hiệu tắc nghẽn")
+                    .trangThai(RepairRequest.TrangThai.CHO_XU_LY)
+                    .ngayGui(LocalDateTime.of(2026, 6, 25, 8, 15))
+                    .build();
+                repairRequestRepository.save(req);
+            }
+        }
+
+        // ─── SEED FOR TENANT 4 (Phạm Hồng Đăng) ON ROOM 203 ───
+        User tenant4 = userRepository.findBySoDienThoai("0933445566").orElse(null);
+        Room room203 = roomRepository.findAll().stream()
+            .filter(r -> r.getTenPhong().equals("Phòng 203"))
+            .findFirst()
+            .orElse(null);
+
+        if (tenant4 != null && room203 != null) {
+            boolean hasContract203 = contractRepository.findAll().stream()
+                .anyMatch(c -> c.getKhachThue().getId().equals(tenant4.getId()) && c.getRoom().getId().equals(room203.getId()));
+            if (!hasContract203) {
+                Contract contract = Contract.builder()
+                    .room(room203)
+                    .khachThue(tenant4)
+                    .ngayBatDau(LocalDate.of(2026, 4, 1))
+                    .ngayKetThuc(LocalDate.of(2027, 3, 31))
+                    .giaThue(room203.getGiaThue())
+                    .tienCoc(room203.getGiaThue())
+                    .soNguoiO(1)
+                    .trangThai(Contract.TrangThai.HIEU_LUC)
+                    .dichVu(services)
+                    .kyDongTien(1)
+                    .build();
+                contractRepository.save(contract);
+                
+                room203.setTrangThai(Room.TrangThai.DA_THUE);
+                roomRepository.save(room203);
+
+                log.info("Seeded active contract for Room 203");
+
+                // Seed Invoices (Apr to May paid, June unpaid)
+                seedInvoiceIfNotExist(contract, up, 4, 2026, new BigDecimal("50"), new BigDecimal("130"), new BigDecimal("4"), new BigDecimal("11"), true);
+                seedInvoiceIfNotExist(contract, up, 5, 2026, new BigDecimal("130"), new BigDecimal("240"), new BigDecimal("11"), new BigDecimal("19"), true);
+                seedInvoiceIfNotExist(contract, up, 6, 2026, new BigDecimal("240"), new BigDecimal("240"), new BigDecimal("19"), new BigDecimal("19"), false);
+
+                // Seed completed repair request
+                RepairRequest req = RepairRequest.builder()
+                    .hopDong(contract)
+                    .moTa("Hỏng bản lề tủ quần áo gỗ")
+                    .trangThai(RepairRequest.TrangThai.HOAN_THANH)
+                    .chiPhi(new BigDecimal("80000"))
+                    .ngayGui(LocalDateTime.of(2026, 4, 20, 14, 0))
+                    .ngayCapNhat(LocalDateTime.of(2026, 4, 21, 16, 0))
+                    .build();
+                repairRequestRepository.save(req);
+            }
+        }
+
+        // ─── SEED FOR TENANT 5 (Hoàng Mai Chi) ON ROOM 303 ───
+        User tenant5 = userRepository.findBySoDienThoai("0944556677").orElse(null);
+        Room room303 = roomRepository.findAll().stream()
+            .filter(r -> r.getTenPhong().equals("Phòng 303"))
+            .findFirst()
+            .orElse(null);
+
+        if (tenant5 != null && room303 != null) {
+            boolean hasContract303 = contractRepository.findAll().stream()
+                .anyMatch(c -> c.getKhachThue().getId().equals(tenant5.getId()) && c.getRoom().getId().equals(room303.getId()));
+            if (!hasContract303) {
+                Contract contract = Contract.builder()
+                    .room(room303)
+                    .khachThue(tenant5)
+                    .ngayBatDau(LocalDate.of(2026, 5, 1))
+                    .ngayKetThuc(LocalDate.of(2027, 4, 30))
+                    .giaThue(room303.getGiaThue())
+                    .tienCoc(room303.getGiaThue())
+                    .soNguoiO(1)
+                    .trangThai(Contract.TrangThai.HIEU_LUC)
+                    .dichVu(services)
+                    .kyDongTien(1)
+                    .build();
+                contractRepository.save(contract);
+                
+                room303.setTrangThai(Room.TrangThai.DA_THUE);
+                roomRepository.save(room303);
+
+                log.info("Seeded active contract for Room 303");
+
+                // Seed Invoices (May paid, June unpaid)
+                seedInvoiceIfNotExist(contract, up, 5, 2026, new BigDecimal("0"), new BigDecimal("85"), new BigDecimal("0"), new BigDecimal("8"), true);
+                seedInvoiceIfNotExist(contract, up, 6, 2026, new BigDecimal("85"), new BigDecimal("85"), new BigDecimal("8"), new BigDecimal("8"), false);
+
+                // Seed pending repair request
+                RepairRequest req = RepairRequest.builder()
+                    .hopDong(contract)
+                    .moTa("Hệ thống thoát nước lavabo bị nghẹt nhẹ")
+                    .trangThai(RepairRequest.TrangThai.CHO_XU_LY)
+                    .ngayGui(LocalDateTime.of(2026, 6, 24, 18, 20))
+                    .build();
+                repairRequestRepository.save(req);
             }
         }
 
         // --- SEED FOR EXISTING TENANT 2 (0902345678) ON THEIR EXISTING ROOM/CONTRACT ---
-        User tenant2 = userRepository.findBySoDienThoai("0902345678").orElse(null);
-        if (tenant2 != null) {
-            // Find active contract for this user (preferably in Room "Phòng 663202")
-            Contract contract2 = contractRepository.findAll().stream()
-                .filter(c -> c.getKhachThue().getId().equals(tenant2.getId()) && c.getTrangThai() == Contract.TrangThai.HIEU_LUC)
+        User tenantOld = userRepository.findBySoDienThoai("0902345678").orElse(null);
+        if (tenantOld != null) {
+            // Find active contract for this user
+            Contract contractOld = contractRepository.findAll().stream()
+                .filter(c -> c.getKhachThue().getId().equals(tenantOld.getId()) && c.getTrangThai() == Contract.TrangThai.HIEU_LUC)
                 .findFirst()
                 .orElse(null);
 
-            if (contract2 != null) {
-                log.info("Found active contract for tenant 0902345678: id={}, room={}", contract2.getId(), contract2.getRoom().getTenPhong());
+            if (contractOld != null) {
+                log.info("Found active contract for tenant 0902345678: id={}, room={}", contractOld.getId(), contractOld.getRoom().getTenPhong());
                 
                 // Let's seed invoices for Feb, Mar, Apr, May 2026 if they don't exist
-                seedInvoiceIfNotExist(contract2, up, 2, 2026, new BigDecimal("150"), new BigDecimal("230"), new BigDecimal("20"), new BigDecimal("26"), true);
-                seedInvoiceIfNotExist(contract2, up, 3, 2026, new BigDecimal("230"), new BigDecimal("320"), new BigDecimal("26"), new BigDecimal("33"), true);
-                seedInvoiceIfNotExist(contract2, up, 4, 2026, new BigDecimal("320"), new BigDecimal("430"), new BigDecimal("33"), new BigDecimal("39"), true);
-                seedInvoiceIfNotExist(contract2, up, 5, 2026, new BigDecimal("430"), new BigDecimal("550"), new BigDecimal("39"), new BigDecimal("47"), true);
+                seedInvoiceIfNotExist(contractOld, up, 2, 2026, new BigDecimal("150"), new BigDecimal("230"), new BigDecimal("20"), new BigDecimal("26"), true);
+                seedInvoiceIfNotExist(contractOld, up, 3, 2026, new BigDecimal("230"), new BigDecimal("320"), new BigDecimal("26"), new BigDecimal("33"), true);
+                seedInvoiceIfNotExist(contractOld, up, 4, 2026, new BigDecimal("320"), new BigDecimal("430"), new BigDecimal("33"), new BigDecimal("39"), true);
+                seedInvoiceIfNotExist(contractOld, up, 5, 2026, new BigDecimal("430"), new BigDecimal("550"), new BigDecimal("39"), new BigDecimal("47"), true);
             } else {
                 log.warn("Active contract not found for tenant 0902345678");
             }
