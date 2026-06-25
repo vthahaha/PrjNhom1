@@ -65,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/actuator/health").permitAll()  // Docker healthcheck
                         .requestMatchers("/ws/**").permitAll()            // Cho phép handshake WebSocket (token được xác thực trong handler)
+                        .requestMatchers("/error").permitAll()            // Cho phép hiển thị lỗi hệ thống thay vì bị đè bởi lỗi 401
                         // ── Mọi request còn lại phải có JWT hợp lệ ─────────
                         .anyRequest().authenticated()
                 )
