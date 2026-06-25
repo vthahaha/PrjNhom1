@@ -4,6 +4,7 @@ import { PlusOutlined, UploadOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { repairApi, contractApi, publicApi } from '../../api'
+import { getBaseURL } from '../../api/axiosInstance'
 
 const { Title } = Typography
 
@@ -81,7 +82,7 @@ export default function MyRepairRequestsPage() {
       align: 'center',
       render: v => v ? (
         <Image 
-          src={`/api/public/files/${v}`} 
+          src={`${getBaseURL()}/public/files/${v}`} 
           alt="Sự cố" 
           style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }} 
           placeholder={<Spin size="small" />}

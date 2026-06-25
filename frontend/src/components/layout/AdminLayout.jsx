@@ -46,8 +46,17 @@ export default function AdminLayout() {
     const jwtToken = localStorage.getItem('token')
     if (!jwtToken) return
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const wsUrl = `${protocol}//${window.location.host}/ws/notifications?token=${jwtToken}`
+    const getWsUrl = () => {
+      const apiUrl = import.meta.env.VITE_API_URL
+      if (apiUrl && apiUrl.startsWith('http')) {
+        const wsProtocol = apiUrl.startsWith('https') ? 'wss:' : 'ws:'
+        const host = apiUrl.replace(/^https?:\/\//, '')
+        return `${wsProtocol}//${host}/ws/notifications?token=${jwtToken}`
+      }
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      return `${protocol}//${window.location.host}/ws/notifications?token=${jwtToken}`
+    }
+    const wsUrl = getWsUrl()
     
     let ws = new WebSocket(wsUrl)
 

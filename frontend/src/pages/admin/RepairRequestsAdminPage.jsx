@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { repairApi } from '../../api'
+import { getBaseURL } from '../../api/axiosInstance'
 import { getColumnSearchProps } from '../../utils/tableUtils'
 
 const { Title } = Typography
@@ -53,7 +54,7 @@ export default function RepairRequestsAdminPage() {
       align: 'center',
       render: v => v ? (
         <Image 
-          src={v.startsWith('http') ? v : `/api/public/files/${v}`} 
+          src={v.startsWith('http') ? v : `${getBaseURL()}/public/files/${v}`} 
           alt="Sự cố" 
           style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }} 
           placeholder={<Spin size="small" />}
