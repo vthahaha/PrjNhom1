@@ -49,9 +49,13 @@ export default function AdminLayout() {
     const getWsUrl = () => {
       const apiUrl = import.meta.env.VITE_API_URL
       if (apiUrl && apiUrl.startsWith('http')) {
-        const wsProtocol = apiUrl.startsWith('https') ? 'wss:' : 'ws:'
-        const host = apiUrl.replace(/^https?:\/\//, '')
-        return `${wsProtocol}//${host}/ws/notifications?token=${jwtToken}`
+        try {
+          const url = new URL(apiUrl)
+          const wsProtocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
+          return `${wsProtocol}//${url.host}/ws/notifications?token=${jwtToken}`
+        } catch (e) {
+          console.error('Invalid VITE_API_URL', e)
+        }
       }
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
       return `${protocol}//${window.location.host}/ws/notifications?token=${jwtToken}`
