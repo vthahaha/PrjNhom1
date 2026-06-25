@@ -9,5 +9,6 @@ public record RoomServiceResponse(
     String donVi,
     BigDecimal donGiaMacDinh,
     BigDecimal donGiaOverride,   // null nếu dùng giá mặc định
-    BigDecimal donGiaApDung      // giá thực áp dụng = override ?? macDinh
+    BigDecimal donGiaApDung,      // giá thực áp dụng = override ?? macDinh
+    Integer soLuong
 ) {}

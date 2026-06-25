@@ -7,6 +7,7 @@ import com.roomrental.exception.BadRequestException;
 import com.roomrental.exception.ResourceNotFoundException;
 import com.roomrental.repository.*;
 import com.roomrental.service.ContractExtensionRequestService;
+import com.roomrental.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class ContractExtensionRequestServiceImpl implements ContractExtensionReq
     private final ContractRepository contractRepository;
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -38,7 +40,7 @@ public class ContractExtensionRequestServiceImpl implements ContractExtensionReq
         ContractExtensionRequest request = ContractExtensionRequest.builder()
                 .contract(contract)
                 .tenant(tenant)
-                .soThangGiaHan(requestDto.soThangGiaHan())
+                .ngayKetThucMoi(requestDto.ngayKetThucMoi())
                 .ghiChu(requestDto.ghiChu())
                 .trangThai(ContractExtensionRequest.TrangThai.PENDING)
                 .build();
@@ -46,14 +48,9 @@ public class ContractExtensionRequestServiceImpl implements ContractExtensionReq
         ContractExtensionRequest saved = requestRepository.save(request);
 
         // Tạo thông báo cho admin
-        String msg = String.format("Khách thuê %s đã gửi yêu cầu gia hạn hợp đồng phòng %s thêm %d tháng.",
-                tenant.getHoTen(), contract.getRoom().getTenPhong(), requestDto.soThangGiaHan());
-        Notification notification = Notification.builder()
-                .noiDung(msg)
-                .daDoc(false)
-                .forAdmin(true)
-                .build();
-        notificationRepository.save(notification);
+        String msg = String.format("Khách thuê %s đã gửi yêu cầu gia hạn hợp đồng phòng %s đến ngày %s.",
+                tenant.getHoTen(), contract.getRoom().getTenPhong(), requestDto.ngayKetThucMoi().toString());
+        notificationService.createAndSend(msg, null, true);
 
         log.info("Created extension request ID {} and admin notification", saved.getId());
         return toResponse(saved);
@@ -86,21 +83,16 @@ public class ContractExtensionRequestServiceImpl implements ContractExtensionReq
         req.setTrangThai(ContractExtensionRequest.TrangThai.APPROVED);
         Contract contract = req.getContract();
         LocalDate oldEnd = contract.getNgayKetThuc();
-        LocalDate newEnd = oldEnd.plusMonths(req.getSoThangGiaHan());
+        LocalDate newEnd = req.getNgayKetThucMoi();
         contract.setNgayKetThuc(newEnd);
         contractRepository.save(contract);
         
         ContractExtensionRequest saved = requestRepository.save(req);
 
         // Thêm thông báo cho tenant
-        String msg = String.format("Yêu cầu gia hạn hợp đồng phòng %s thêm %d tháng đã được PHÊ DUYỆT. Hạn mới: %s",
-                contract.getRoom().getTenPhong(), req.getSoThangGiaHan(), newEnd.toString());
-        Notification notification = Notification.builder()
-                .noiDung(msg)
-                .daDoc(false)
-                .forAdmin(false) // Gửi cho tenant
-                .build();
-        notificationRepository.save(notification);
+        String msg = String.format("Yêu cầu gia hạn hợp đồng phòng %s đến ngày %s đã được PHÊ DUYỆT.",
+                contract.getRoom().getTenPhong(), newEnd.toString());
+        notificationService.createAndSend(msg, req.getTenant(), false);
 
         log.info("Approved extension request ID {}, contract end date extended from {} to {}", requestId, oldEnd, newEnd);
         return toResponse(saved);
@@ -120,14 +112,9 @@ public class ContractExtensionRequestServiceImpl implements ContractExtensionReq
         ContractExtensionRequest saved = requestRepository.save(req);
 
         // Thêm thông báo cho tenant
-        String msg = String.format("Yêu cầu gia hạn hợp đồng phòng %s thêm %d tháng đã bị TỪ CHỐI.",
-                req.getContract().getRoom().getTenPhong(), req.getSoThangGiaHan());
-        Notification notification = Notification.builder()
-                .noiDung(msg)
-                .daDoc(false)
-                .forAdmin(false)
-                .build();
-        notificationRepository.save(notification);
+        String msg = String.format("Yêu cầu gia hạn hợp đồng phòng %s đến ngày %s đã bị TỪ CHỐI.",
+                req.getContract().getRoom().getTenPhong(), req.getNgayKetThucMoi().toString());
+        notificationService.createAndSend(msg, req.getTenant(), false);
 
         log.info("Rejected extension request ID {}", requestId);
         return toResponse(saved);
@@ -140,7 +127,7 @@ public class ContractExtensionRequestServiceImpl implements ContractExtensionReq
                 req.getContract().getRoom().getTenPhong(),
                 req.getTenant().getId(),
                 req.getTenant().getHoTen(),
-                req.getSoThangGiaHan(),
+                req.getNgayKetThucMoi(),
                 req.getGhiChu(),
                 req.getTrangThai(),
                 req.getCreatedAt(),

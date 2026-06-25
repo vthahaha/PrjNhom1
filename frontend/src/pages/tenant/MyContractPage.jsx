@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, Descriptions, Tag, Typography, Spin, Empty, Button, Modal, Form, InputNumber, Input, Table, App } from 'antd'
+import { Card, Descriptions, Tag, Typography, Spin, Empty, Button, Modal, Form, Input, Table, App, DatePicker } from 'antd'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { contractApi } from '../../api'
@@ -49,10 +49,10 @@ export default function MyContractPage() {
       render: (val) => dayjs(val).format('DD/MM/YYYY HH:mm')
     },
     {
-      title: 'Số tháng gia hạn',
-      dataIndex: 'soThangGiaHan',
-      key: 'soThangGiaHan',
-      render: (val) => <strong>{val} tháng</strong>
+      title: 'Ngày kết thúc mới',
+      dataIndex: 'ngayKetThucMoi',
+      key: 'ngayKetThucMoi',
+      render: (val) => val ? <strong>{dayjs(val).format('DD/MM/YYYY')}</strong> : '—'
     },
     {
       title: 'Ghi chú',
@@ -66,10 +66,10 @@ export default function MyContractPage() {
       render: (status) => {
         let color = 'gold'
         let text = 'Chờ duyệt'
-        if (status === 'DA_DUYET') {
+        if (status === 'APPROVED') {
           color = 'green'
           text = 'Đã duyệt'
-        } else if (status === 'TU_CHOI') {
+        } else if (status === 'REJECTED') {
           color = 'red'
           text = 'Từ chối'
         }
@@ -77,6 +77,9 @@ export default function MyContractPage() {
       }
     }
   ]
+
+  const totalDays = dayjs(data.ngayKetThuc).diff(dayjs(data.ngayBatDau), 'day')
+  const spentDays = Math.max(0, dayjs().diff(dayjs(data.ngayBatDau), 'day'))
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -103,6 +106,9 @@ export default function MyContractPage() {
           </Descriptions.Item>
           <Descriptions.Item label="Ngày bắt đầu">{dayjs(data.ngayBatDau).format('DD/MM/YYYY')}</Descriptions.Item>
           <Descriptions.Item label="Ngày kết thúc">{dayjs(data.ngayKetThuc).format('DD/MM/YYYY')}</Descriptions.Item>
+          <Descriptions.Item label="Thời gian thuê" span={2}>
+            <strong>{totalDays} ngày</strong> (Đã ở: <strong>{spentDays} ngày</strong>)
+          </Descriptions.Item>
           <Descriptions.Item label="Giá thuê">{Number(data.giaThue).toLocaleString('vi-VN')} đ/tháng</Descriptions.Item>
           <Descriptions.Item label="Tiền cọc">{Number(data.tienCoc).toLocaleString('vi-VN')} đ</Descriptions.Item>
           <Descriptions.Item label="Kỳ đóng tiền">
@@ -135,26 +141,39 @@ export default function MyContractPage() {
         onCancel={() => setIsModalOpen(false)}
         onOk={() => form.submit()}
         confirmLoading={createRequestMutation.isPending}
+        destroyOnClose
       >
         <Form
           form={form}
           layout="vertical"
-          initialValues={{ soThangGiaHan: 6 }}
-          onFinish={(v) => createRequestMutation.mutate(v)}
+          onFinish={(v) => {
+            const payload = {
+              ...v,
+              ngayKetThucMoi: v.ngayKetThucMoi.format('YYYY-MM-DD')
+            }
+            createRequestMutation.mutate(payload)
+          }}
           style={{ marginTop: 16 }}
         >
           <Form.Item
-            label="Số tháng muốn gia hạn"
-            name="soThangGiaHan"
-            rules={[{ required: true, message: 'Vui lòng chọn số tháng muốn gia hạn!' }]}
+            label="Ngày kết thúc gia hạn mới"
+            name="ngayKetThucMoi"
+            rules={[{ required: true, message: 'Vui lòng chọn ngày kết thúc gia hạn mới!' }]}
           >
-            <InputNumber min={1} max={60} style={{ width: '100%' }} addonAfter="tháng" />
+            <DatePicker
+              style={{ width: '100%' }}
+              format="DD/MM/YYYY"
+              disabledDate={(current) => {
+                // Ràng buộc phải sau ngày kết thúc hiện tại
+                return current && current.isBefore(dayjs(data.ngayKetThuc).endOf('day'))
+              }}
+            />
           </Form.Item>
           <Form.Item
             label="Ghi chú / Tin nhắn gửi chủ nhà"
             name="ghiChu"
           >
-            <Input.TextArea rows={3} placeholder="Ví dụ: Tôi muốn gia hạn thêm 6 tháng kể từ ngày hết hạn cũ..." />
+            <Input.TextArea rows={3} placeholder="Ví dụ: Tôi muốn gia hạn thêm đến ngày..." />
           </Form.Item>
         </Form>
       </Modal>

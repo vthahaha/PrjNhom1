@@ -21,6 +21,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final com.roomrental.security.NotificationWebSocketHandler webSocketHandler;
 
     @Override
     public List<NotificationResponse> getAdminNotifications() {
@@ -66,6 +67,24 @@ public class NotificationServiceImpl implements NotificationService {
         User user = userRepository.findBySoDienThoai(soDienThoai)
                 .orElseThrow(() -> new ResourceNotFoundException("Người dùng không tồn tại"));
         return notificationRepository.countByUserIdAndDaDoc(user.getId(), false);
+    }
+
+    @Override
+    @Transactional
+    public void createAndSend(String content, User user, boolean forAdmin) {
+        Notification n = Notification.builder()
+                .noiDung(content)
+                .user(user)
+                .forAdmin(forAdmin)
+                .daDoc(false)
+                .build();
+        Notification saved = notificationRepository.save(n);
+        
+        try {
+            webSocketHandler.sendNotification(saved);
+        } catch (Exception e) {
+            log.error("Lỗi khi gửi thông báo WebSocket: {}", e.getMessage());
+        }
     }
 
     private NotificationResponse toResponse(Notification n) {

@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Table, Button, Tag, Typography, Modal, Form, Input, App, Space, Checkbox } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
+import { Table, Button, Tag, Typography, Modal, Form, Input, App, Space, Checkbox, Upload, Image, Spin } from 'antd'
+import { PlusOutlined, UploadOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { repairApi, contractApi } from '../../api'
+import { repairApi, contractApi, publicApi } from '../../api'
 
 const { Title } = Typography
 
@@ -15,6 +15,8 @@ const trangThaiConfig = {
 
 export default function MyRepairRequestsPage() {
   const [modalOpen, setModalOpen] = useState(false)
+  const [uploadedFileName, setUploadedFileName] = useState('')
+  const [fileList, setFileList] = useState([])
   const [form] = Form.useForm()
   const { message } = App.useApp()
   const qc = useQueryClient()
@@ -36,11 +38,33 @@ export default function MyRepairRequestsPage() {
     mutationFn: repairApi.create,
     onSuccess: () => {
       message.success('Đã gửi yêu cầu sửa chữa')
-      setModalOpen(false); form.resetFields()
+      closeModal()
       qc.invalidateQueries({ queryKey: ['my-repairs'] })
     },
     onError: (e) => message.error(e.response?.data?.message || 'Lỗi khi gửi yêu cầu'),
   })
+
+  const openModal = () => {
+    setUploadedFileName('')
+    setFileList([])
+    form.resetFields()
+    setModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setModalOpen(false)
+    setUploadedFileName('')
+    setFileList([])
+    form.resetFields()
+  }
+
+  const onFinish = (values) => {
+    const payload = {
+      ...values,
+      anhUrl: uploadedFileName || null
+    }
+    createMutation.mutate(payload)
+  }
 
   const columns = [
     { title: 'STT', key: 'stt', width: 60, align: 'center', render: (_, __, index) => index + 1 },
@@ -48,6 +72,21 @@ export default function MyRepairRequestsPage() {
     {
       title: 'CSVC hỏng', dataIndex: 'csvcHieuHong', key: 'csvcHieuHong',
       render: v => v ? <Space size={[0, 4]} wrap>{v.split(', ').map(i => <Tag key={i} color="red">{i}</Tag>)}</Space> : '—'
+    },
+    { 
+      title: 'Ảnh minh họa', 
+      dataIndex: 'anhUrl', 
+      key: 'anhUrl', 
+      width: 110,
+      align: 'center',
+      render: v => v ? (
+        <Image 
+          src={`/api/public/files/${v}`} 
+          alt="Sự cố" 
+          style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }} 
+          placeholder={<Spin size="small" />}
+        />
+      ) : '—' 
     },
     { title: 'Ngày gửi', dataIndex: 'ngayGui', key: 'ngayGui', render: v => dayjs(v).format('DD/MM/YYYY HH:mm') },
     {
@@ -60,12 +99,12 @@ export default function MyRepairRequestsPage() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
         <Title level={4} style={{ margin: 0 }}>Yêu cầu sửa chữa</Title>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>Gửi yêu cầu</Button>
+        <Button type="primary" icon={<PlusOutlined />} onClick={openModal}>Gửi yêu cầu</Button>
       </div>
       <Table rowKey="id" dataSource={data ?? []} columns={columns} loading={isLoading} pagination={{ pageSize: 10 }} />
 
-      <Modal title="Gửi yêu cầu sửa chữa" open={modalOpen} onCancel={() => { setModalOpen(false); form.resetFields() }} footer={null} destroyOnHidden>
-        <Form form={form} layout="vertical" onFinish={(v) => createMutation.mutate(v)} style={{ marginTop: 16 }}>
+      <Modal title="Gửi yêu cầu sửa chữa" open={modalOpen} onCancel={closeModal} footer={null} destroyOnHidden>
+        <Form form={form} layout="vertical" onFinish={onFinish} style={{ marginTop: 16 }}>
           {roomFacilities.length > 0 && (
             <Form.Item label="Chọn Cơ sở vật chất hỏng" name="csvcHieuHong">
               <Checkbox.Group options={roomFacilities} />
@@ -89,12 +128,37 @@ export default function MyRepairRequestsPage() {
           >
             <Input.TextArea rows={4} placeholder="Mô tả chi tiết vấn đề cần sửa chữa..." />
           </Form.Item>
-          <Form.Item label="Đường dẫn ảnh (tùy chọn)" name="anhUrl">
-            <Input placeholder="https://..." />
+          <Form.Item label="Ảnh minh họa sự cố" name="anhUrl">
+            <Upload
+              maxCount={1}
+              listType="picture-card"
+              fileList={fileList}
+              onChange={({ fileList }) => setFileList(fileList)}
+              customRequest={async ({ file, onSuccess, onError }) => {
+                const formData = new FormData()
+                formData.append('file', file)
+                try {
+                  const res = await publicApi.uploadFile(formData)
+                  setUploadedFileName(res.data.fileName)
+                  onSuccess(res.data)
+                } catch (e) {
+                  message.error('Lỗi khi tải ảnh lên')
+                  onError(e)
+                }
+              }}
+              onRemove={() => setUploadedFileName('')}
+            >
+              {fileList.length < 1 && (
+                <div>
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>Tải ảnh</div>
+                </div>
+              )}
+            </Upload>
           </Form.Item>
           <Form.Item style={{ textAlign: 'right', marginBottom: 0 }}>
             <Space>
-              <Button onClick={() => { setModalOpen(false); form.resetFields() }}>Hủy</Button>
+              <Button onClick={closeModal}>Hủy</Button>
               <Button type="primary" htmlType="submit" loading={createMutation.isPending}>Gửi yêu cầu</Button>
             </Space>
           </Form.Item>

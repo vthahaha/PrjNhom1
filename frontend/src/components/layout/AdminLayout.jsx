@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { Layout, Menu, Button, Avatar, Dropdown, Typography, theme, Badge, List } from 'antd'
+import { Layout, Menu, Button, Avatar, Dropdown, Typography, theme, Badge, List, App } from 'antd'
 import {
   DashboardOutlined, HomeOutlined, TeamOutlined, FileTextOutlined,
   DollarOutlined, AppstoreOutlined, ToolOutlined,
@@ -40,6 +40,56 @@ export default function AdminLayout() {
   const { user, logout } = useAuth()
   const { token } = theme.useToken()
   const qc = useQueryClient()
+  const { message, notification } = App.useApp()
+
+  useEffect(() => {
+    const jwtToken = localStorage.getItem('token')
+    if (!jwtToken) return
+
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const wsUrl = `${protocol}//${window.location.host}/ws/notifications?token=${jwtToken}`
+    
+    let ws = new WebSocket(wsUrl)
+
+    const connectWs = () => {
+      ws.onopen = () => {
+        console.log('WebSocket admin connected')
+      }
+      ws.onmessage = (event) => {
+        try {
+          const notificationData = JSON.parse(event.data)
+          qc.invalidateQueries({ queryKey: ['admin-notifications'] })
+          qc.invalidateQueries({ queryKey: ['admin-notifications-unread-count'] })
+          
+          notification.info({
+            message: notificationData.tieuDe || 'Thông báo mới',
+            description: notificationData.noiDung || '',
+            placement: 'topRight',
+          })
+        } catch (e) {
+          console.error('Error handling admin notification message', e)
+        }
+      }
+      ws.onerror = (e) => {
+        console.error('WebSocket admin error', e)
+      }
+      ws.onclose = () => {
+        console.log('WebSocket admin disconnected, reconnecting in 5s...')
+        setTimeout(() => {
+          if (localStorage.getItem('token')) {
+            ws = new WebSocket(wsUrl)
+            connectWs()
+          }
+        }, 5000)
+      }
+    }
+
+    connectWs()
+
+    return () => {
+      ws.close()
+    }
+  }, [qc, notification])
 
   // -- Notification Center Queries & Mutations --
   const { data: notifications, isLoading: loadingNotifications } = useQuery({

@@ -2,10 +2,14 @@
 FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
 
-COPY pom.xml .
-COPY src ./src
+RUN apk add --no-cache maven
 
-RUN apk add --no-cache maven && mvn clean package -DskipTests
+# Copy pom.xml and pre-fetch dependencies (Docker layer caching)
+COPY pom.xml .
+RUN mvn dependency:resolve -B
+
+COPY src ./src
+RUN mvn clean package -DskipTests -B
 
 # ── Runtime stage ─────────────────────────────────────────
 FROM eclipse-temurin:21-jre-alpine

@@ -23,6 +23,8 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     List<Invoice> findByHopDongKhachThueId(Long userId);
 
+    java.util.Optional<Invoice> findTopByHopDongIdAndThangAndNam(Long hopDongId, Integer thang, Integer nam);
+
     long countByTrangThai(Invoice.TrangThai trangThai);
 
     @Query(value = "SELECT COALESCE(SUM(tong_tien), 0) FROM invoice WHERE trang_thai = 'CHUA_TT'", nativeQuery = true)

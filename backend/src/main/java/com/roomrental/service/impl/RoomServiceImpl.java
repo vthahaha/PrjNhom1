@@ -2,6 +2,10 @@ package com.roomrental.service.impl;
 
 import com.roomrental.dto.request.RoomRequest;
 import com.roomrental.dto.response.RoomResponse;
+import com.roomrental.dto.response.RoomDetailResponse;
+import com.roomrental.dto.response.ContractResponse;
+import com.roomrental.dto.response.InvoiceResponse;
+import com.roomrental.dto.response.RepairRequestResponse;
 import com.roomrental.entity.Contract;
 import com.roomrental.entity.Room;
 import com.roomrental.exception.BadRequestException;
@@ -9,6 +13,9 @@ import com.roomrental.exception.ResourceNotFoundException;
 import com.roomrental.repository.ContractRepository;
 import com.roomrental.repository.RoomRepository;
 import com.roomrental.service.RoomService;
+import com.roomrental.service.InvoiceService;
+import com.roomrental.service.RepairRequestService;
+import com.roomrental.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,6 +30,9 @@ public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
     private final ContractRepository contractRepository;
+    private final InvoiceService invoiceService;
+    private final RepairRequestService repairRequestService;
+    private final FileStorageService fileStorageService;
 
     @Override
     @Cacheable(value = "rooms", key = "{#search, #trangThai, #availableForContract}")
@@ -102,5 +112,38 @@ public class RoomServiceImpl implements RoomService {
         return new RoomResponse(room.getId(), room.getTenPhong(), room.getDienTich(),
                 room.getSoNguoiToiDa(), room.getTienNghi(), room.getGiaThue(),
                 room.getTrangThai(), room.getCreatedAt(), currentOccupants);
+    }
+
+    @Override
+    public RoomDetailResponse getRoomDetail(Long id) {
+        Room room = findRoom(id);
+        RoomResponse roomResponse = toResponse(room);
+        
+        List<Contract> activeContracts = contractRepository.findByRoomIdAndTrangThai(id, Contract.TrangThai.HIEU_LUC);
+        Contract activeContract = activeContracts.isEmpty() ? null : activeContracts.get(0);
+        ContractResponse activeContractResponse = activeContract != null ? toContractResponse(activeContract) : null;
+        
+        List<InvoiceResponse> recentInvoices = invoiceService.getAll(null, null, id, null);
+        List<RepairRequestResponse> recentRepairRequests = repairRequestService.getAll(id, null, null);
+        
+        return new RoomDetailResponse(roomResponse, activeContractResponse, recentInvoices, recentRepairRequests);
+    }
+
+    private ContractResponse toContractResponse(Contract c) {
+        List<ContractResponse.DichVuInfo> dichVuInfos = c.getDichVu() == null ? List.of() :
+            c.getDichVu().stream()
+                .map(s -> new ContractResponse.DichVuInfo(s.getId(), s.getTenDichVu(), s.getDonGiaMacDinh(), s.getDonVi()))
+                .toList();
+        return new ContractResponse(
+                c.getId(),
+                c.getRoom().getId(), c.getRoom().getTenPhong(),
+                c.getKhachThue().getId(), c.getKhachThue().getHoTen(), c.getKhachThue().getSoDienThoai(),
+                c.getNgayBatDau(), c.getNgayKetThuc(),
+                c.getGiaThue(), c.getTienCoc(),
+                c.getTrangThai(), c.getSoNguoiO(), c.getLyDoChamDut(), c.getNgayTraPhong(),
+                c.getCreatedAt(), c.getRoom().getTienNghi(),
+                fileStorageService.getPresignedUrl(c.getFileHopDongUrl()),
+                c.getKyDongTien(),
+                dichVuInfos);
     }
 }

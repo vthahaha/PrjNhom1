@@ -11,4 +11,5 @@ public interface NotificationService {
     void markAllAdminAsRead();
     long getUnreadAdminCount();
     long getUnreadTenantCount(String soDienThoai);
+    void createAndSend(String content, com.roomrental.entity.User user, boolean forAdmin);
 }

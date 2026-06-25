@@ -178,21 +178,21 @@ export default function ContractsPage() {
     { title: 'STT', key: 'stt', width: 60, align: 'center', render: (_, __, index) => index + 1 },
     { title: 'Phòng', dataIndex: 'tenPhong', key: 'tenPhong' },
     { title: 'Khách thuê', dataIndex: 'hoTenTenant', key: 'hoTenTenant' },
-    { title: 'Số tháng gia hạn', dataIndex: 'soThangGiaHan', key: 'soThangGiaHan', render: v => <strong>{v} tháng</strong> },
+    { title: 'Ngày kết thúc mới', dataIndex: 'ngayKetThucMoi', key: 'ngayKetThucMoi', render: v => v ? <strong>{dayjs(v).format('DD/MM/YYYY')}</strong> : '—' },
     { title: 'Ghi chú', dataIndex: 'ghiChu', key: 'ghiChu' },
     { title: 'Ngày gửi', dataIndex: 'createdAt', key: 'createdAt', render: v => dayjs(v).format('DD/MM/YYYY HH:mm') },
     { title: 'Trạng thái', dataIndex: 'trangThai', key: 'trangThai',
       render: v => {
         let color = 'gold'
         let text = 'Chờ duyệt'
-        if (v === 'DA_DUYET') { color = 'green'; text = 'Đã duyệt' }
-        else if (v === 'TU_CHOI') { color = 'red'; text = 'Từ chối' }
+        if (v === 'APPROVED') { color = 'green'; text = 'Đã duyệt' }
+        else if (v === 'REJECTED') { color = 'red'; text = 'Từ chối' }
         return <Tag color={color}>{text}</Tag>
       }
     },
     {
       title: 'Thao tác', key: 'action',
-      render: (_, r) => r.trangThai === 'CHO_DUYET' && (
+      render: (_, r) => r.trangThai === 'PENDING' && (
         <Space>
           <Button type="primary" size="small" onClick={() => approveMutation.mutate(r.id)} loading={approveMutation.isPending}>Duyệt</Button>
           <Button type="primary" danger size="small" onClick={() => rejectMutation.mutate(r.id)} loading={rejectMutation.isPending}>Từ chối</Button>

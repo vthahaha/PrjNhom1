@@ -96,6 +96,7 @@ public class ServiceServiceImpl implements ServiceService {
                     .room(room)
                     .service(svc)
                     .donGiaOverride(item.donGiaOverride())
+                    .soLuong(item.soLuong() != null ? item.soLuong() : 1)
                     .build());
         }).toList();
         return saved.stream().map(this::toRoomServiceResponse).toList();
@@ -129,6 +130,7 @@ public class ServiceServiceImpl implements ServiceService {
                 rs.getService().getDonVi(),
                 rs.getService().getDonGiaMacDinh(),
                 rs.getDonGiaOverride(),
-                apDung);
+                apDung,
+                rs.getSoLuong() != null ? rs.getSoLuong() : 1);
     }
 }

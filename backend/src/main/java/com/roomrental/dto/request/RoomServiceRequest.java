@@ -11,6 +11,7 @@ public record RoomServiceRequest(
 ) {
     public record Item(
         @NotNull Long dichVuId,
-        BigDecimal donGiaOverride   // null → dùng đơn giá mặc định
+        BigDecimal donGiaOverride,   // null → dùng đơn giá mặc định
+        Integer soLuong
     ) {}
 }

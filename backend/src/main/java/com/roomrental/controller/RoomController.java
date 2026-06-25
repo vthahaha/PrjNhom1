@@ -2,6 +2,7 @@ package com.roomrental.controller;
 
 import com.roomrental.dto.request.RoomRequest;
 import com.roomrental.dto.response.RoomResponse;
+import com.roomrental.dto.response.RoomDetailResponse;
 import com.roomrental.entity.Room;
 import com.roomrental.service.RoomService;
 import jakarta.validation.Valid;
@@ -60,5 +61,11 @@ public class RoomController {
     public ResponseEntity<RoomResponse> updateStatus(@PathVariable Long id,
                                                       @RequestParam Room.TrangThai trangThai) {
         return ResponseEntity.ok(roomService.updateStatus(id, trangThai));
+    }
+
+    @GetMapping("/{id}/detail")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(roomService.getRoomDetail(id));
     }
 }

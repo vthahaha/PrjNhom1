@@ -13,6 +13,8 @@ import com.roomrental.repository.RepairRequestRepository;
 import com.roomrental.repository.UserRepository;
 import com.roomrental.repository.NotificationRepository;
 import com.roomrental.service.RepairRequestService;
+import com.roomrental.service.NotificationService;
+import com.roomrental.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,8 @@ public class RepairRequestServiceImpl implements RepairRequestService {
     private final ContractRepository contractRepository;
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
+    private final FileStorageService fileStorageService;
 
     @Override
     @Transactional
@@ -53,12 +57,7 @@ public class RepairRequestServiceImpl implements RepairRequestService {
         // Tạo thông báo cho admin
         String msg = String.format("Khách thuê %s (Phòng %s) gửi yêu cầu sửa chữa: %s",
                 user.getHoTen(), contract.getRoom().getTenPhong(), moTa);
-        Notification notification = Notification.builder()
-                .noiDung(msg)
-                .daDoc(false)
-                .forAdmin(true)
-                .build();
-        notificationRepository.save(notification);
+        notificationService.createAndSend(msg, null, true);
 
         return toResponse(saved);
     }
@@ -101,7 +100,9 @@ public class RepairRequestServiceImpl implements RepairRequestService {
                 rr.getHopDong().getRoom().getTenPhong(),
                 rr.getHopDong().getKhachThue().getId(),
                 rr.getHopDong().getKhachThue().getHoTen(),
-                rr.getMoTa(), rr.getAnhUrl(), rr.getCsvcHieuHong(),
+                rr.getMoTa(),
+                fileStorageService.getPresignedUrl(rr.getAnhUrl()),
+                rr.getCsvcHieuHong(),
                 rr.getTrangThai(), rr.getNgayGui(), rr.getNgayCapNhat(), rr.getChiPhi());
     }
 }

@@ -24,6 +24,7 @@ export const roomApi = {
     api.patch(`/rooms/${id}/status`, null, { params: { trangThai } }),
   getServices: (id) => api.get(`/rooms/${id}/services`),
   updateServices: (id, data) => api.put(`/rooms/${id}/services`, data),
+  getRoomDetail: (id) => api.get(`/rooms/${id}/detail`),
 }
 
 // ── TENANTS ───────────────────────────────────────────────
@@ -105,6 +106,9 @@ export const dashboardApi = {
 export const publicApi = {
   getRooms: () => api.get('/public/rooms'),
   getRoomById: (id) => api.get(`/public/rooms/${id}`),
+  uploadFile: (formData) => api.post('/public/files/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
 }
 
 // ── NOTIFICATIONS ─────────────────────────────────────────

@@ -13,4 +13,5 @@ public interface RoomService {
     RoomResponse update(Long id, RoomRequest request);
     void delete(Long id);
     RoomResponse updateStatus(Long id, Room.TrangThai trangThai);
+    com.roomrental.dto.response.RoomDetailResponse getRoomDetail(Long id);
 }

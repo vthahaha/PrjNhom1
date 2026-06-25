@@ -119,20 +119,10 @@ export default function MonthlyDebtsPage() {
     },
     {
       title: 'Tiền phòng',
+      dataIndex: 'tienPhong',
       key: 'tienPhong',
-      width: 180,
-      render: (_, r) => {
-        const perPerson = Math.round(r.tienPhong / (r.soNguoiO || 1))
-        return (
-          <div>
-            <b>{Number(r.tienPhong).toLocaleString('vi-VN')} đ</b><br/>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              Chia đầu người:<br/>
-              <b>{perPerson.toLocaleString('vi-VN')} đ</b>/người ({r.soNguoiO} người)
-            </Text>
-          </div>
-        )
-      }
+      width: 120,
+      render: v => <b>{Number(v).toLocaleString('vi-VN')} đ</b>
     },
     { 
       title: 'Tổng cộng', 

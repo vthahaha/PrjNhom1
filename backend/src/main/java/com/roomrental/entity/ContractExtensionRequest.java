@@ -26,8 +26,8 @@ public class ContractExtensionRequest {
     @JoinColumn(name = "tenant_id", nullable = false)
     private User tenant;
 
-    @Column(name = "so_thang_gia_han", nullable = false)
-    private Integer soThangGiaHan;
+    @Column(name = "ngay_ket_thuc_moi", nullable = false)
+    private java.time.LocalDate ngayKetThucMoi;
 
     @Column(name = "ghi_chu", columnDefinition = "TEXT")
     private String ghiChu;

@@ -31,4 +31,8 @@ public class RoomService {
      */
     @Column(name = "don_gia_override", precision = 12, scale = 0)
     private BigDecimal donGiaOverride;
+
+    @Column(name = "so_luong", nullable = false)
+    @Builder.Default
+    private Integer soLuong = 1;
 }

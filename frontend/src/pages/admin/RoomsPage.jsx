@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import {
   Table, Button, Tag, Input, Select, Space, Modal, Form,
-  InputNumber, Typography, App, Popconfirm, Checkbox, Row, Col
+  InputNumber, Typography, App, Popconfirm, Checkbox, Row, Col, Tabs, Descriptions, Card
 } from 'antd'
-import { PlusOutlined, SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { PlusOutlined, SearchOutlined, EditOutlined, DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { roomApi, serviceApi } from '../../api'
 import { getColumnSearchProps } from '../../utils/tableUtils'
 
@@ -27,6 +28,11 @@ export default function RoomsPage() {
   const [trangThai, setTrangThai] = useState(undefined)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingRoom, setEditingRoom] = useState(null)
+  
+  // Detail modal state
+  const [detailModalOpen, setDetailModalOpen] = useState(false)
+  const [detailRoomId, setDetailRoomId] = useState(null)
+
   const [form] = Form.useForm()
   const { message } = App.useApp()
   const qc = useQueryClient()
@@ -39,6 +45,13 @@ export default function RoomsPage() {
   const { data: allServices } = useQuery({
     queryKey: ['services'],
     queryFn: () => serviceApi.getAll().then(r => r.data)
+  })
+
+  // Fetch detailed room info for the detail modal
+  const { data: roomDetail, isLoading: isLoadingDetail } = useQuery({
+    queryKey: ['room-detail', detailRoomId],
+    queryFn: () => roomApi.getRoomDetail(detailRoomId).then(r => r.data),
+    enabled: !!detailRoomId,
   })
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ['rooms'] })
@@ -94,7 +107,8 @@ export default function RoomsPage() {
       res.data.forEach(s => {
         servicesMap[s.dichVuId] = {
           checked: true,
-          donGiaOverride: s.donGiaOverride
+          donGiaOverride: s.donGiaOverride,
+          soLuong: s.soLuong || 1
         }
       })
       form.setFieldsValue({ services: servicesMap })
@@ -121,7 +135,8 @@ export default function RoomsPage() {
         if (svcInfo && svcInfo.checked) {
           items.push({
             dichVuId: Number(svcId),
-            donGiaOverride: svcInfo.donGiaOverride || null
+            donGiaOverride: svcInfo.donGiaOverride || null,
+            soLuong: svcInfo.soLuong || 1
           })
         }
       })
@@ -164,6 +179,7 @@ export default function RoomsPage() {
       key: 'action',
       render: (_, record) => (
         <Space>
+          <Button size="small" icon={<InfoCircleOutlined />} onClick={() => { setDetailRoomId(record.id); setDetailModalOpen(true); }}>Chi tiết</Button>
           <Button size="small" icon={<EditOutlined />} onClick={() => openEdit(record)}>Sửa</Button>
           <Popconfirm
             title="Xóa phòng này?"
@@ -177,6 +193,99 @@ export default function RoomsPage() {
       ),
     },
   ]
+
+  const detailTabs = roomDetail ? [
+    {
+      key: 'roomInfo',
+      label: 'Thông tin & Hợp đồng',
+      children: (
+        <Space direction="vertical" style={{ width: '100%' }} size="middle">
+          <Descriptions title="Chi tiết phòng trọ" bordered column={2} size="small">
+            <Descriptions.Item label="Tên phòng">{roomDetail.room?.tenPhong}</Descriptions.Item>
+            <Descriptions.Item label="Giá thuê">{Number(roomDetail.room?.giaThue || 0).toLocaleString('vi-VN')} đ/tháng</Descriptions.Item>
+            <Descriptions.Item label="Diện tích">{roomDetail.room?.dienTich} m²</Descriptions.Item>
+            <Descriptions.Item label="Số người tối đa">{roomDetail.room?.soNguoiToiDa || 'Không giới hạn'}</Descriptions.Item>
+            <Descriptions.Item label="Trạng thái" span={2}>
+              <Tag color={trangThaiConfig[roomDetail.room?.trangThai]?.color}>
+                {trangThaiConfig[roomDetail.room?.trangThai]?.label}
+              </Tag>
+            </Descriptions.Item>
+            <Descriptions.Item label="Tiện nghi" span={2}>{roomDetail.room?.tienNghi || 'Không có'}</Descriptions.Item>
+          </Descriptions>
+
+          {roomDetail.activeContract ? (
+            <Descriptions title="Hợp đồng đang hiệu lực" bordered column={2} size="small">
+              <Descriptions.Item label="Khách thuê">{roomDetail.activeContract.hoTenKhach}</Descriptions.Item>
+              <Descriptions.Item label="Số điện thoại">{roomDetail.activeContract.soDienThoaiKhach}</Descriptions.Item>
+              <Descriptions.Item label="Ngày bắt đầu">{dayjs(roomDetail.activeContract.ngayBatDau).format('DD/MM/YYYY')}</Descriptions.Item>
+              <Descriptions.Item label="Ngày kết thúc">{dayjs(roomDetail.activeContract.ngayKetThuc).format('DD/MM/YYYY')}</Descriptions.Item>
+              <Descriptions.Item label="Tiền đặt cọc">{Number(roomDetail.activeContract.tienCoc || 0).toLocaleString('vi-VN')} đ</Descriptions.Item>
+              <Descriptions.Item label="Số người ở">{roomDetail.activeContract.soNguoiO} người</Descriptions.Item>
+              <Descriptions.Item label="Kỳ đóng tiền">{roomDetail.activeContract.kyDongTien} tháng/lần</Descriptions.Item>
+              <Descriptions.Item label="Trạng thái">
+                <Tag color="green">Đang hiệu lực</Tag>
+              </Descriptions.Item>
+            </Descriptions>
+          ) : (
+            <Card style={{ textAlign: 'center', background: '#fafafa', borderRadius: 8 }}>
+              <Typography.Text type="secondary">Phòng hiện tại chưa có hợp đồng thuê hoạt động.</Typography.Text>
+            </Card>
+          )}
+        </Space>
+      )
+    },
+    {
+      key: 'invoices',
+      label: 'Hóa đơn gần đây',
+      children: (
+        <Table
+          size="small"
+          rowKey="id"
+          dataSource={roomDetail.recentInvoices || []}
+          pagination={{ pageSize: 5 }}
+          columns={[
+            { title: 'Tháng/Năm', key: 'ky', render: (_, r) => `${r.thang}/${r.nam}` },
+            { title: 'Tổng tiền', dataIndex: 'tongTien', render: v => `${Number(v).toLocaleString('vi-VN')} đ` },
+            { 
+              title: 'Trạng thái', 
+              dataIndex: 'trangThai',
+              render: v => <Tag color={v === 'DA_TT' ? 'green' : 'orange'}>{v === 'DA_TT' ? 'Đã thanh toán' : 'Chưa thanh toán'}</Tag>
+            },
+            { title: 'Ngày thanh toán', dataIndex: 'ngayThanhToan', render: v => v ? dayjs(v).format('DD/MM/YYYY') : '—' }
+          ]}
+        />
+      )
+    },
+    {
+      key: 'repairs',
+      label: 'Lịch sử sửa chữa',
+      children: (
+        <Table
+          size="small"
+          rowKey="id"
+          dataSource={roomDetail.recentRepairRequests || []}
+          pagination={{ pageSize: 5 }}
+          columns={[
+            { title: 'Nội dung', dataIndex: 'moTa' },
+            { 
+              title: 'Trạng thái', 
+              dataIndex: 'trangThai',
+              render: v => {
+                const map = {
+                  CHO_XU_LY: { color: 'orange', text: 'Chờ xử lý' },
+                  DANG_XU_LY: { color: 'blue', text: 'Đang xử lý' },
+                  DA_XU_LY: { color: 'green', text: 'Đã hoàn thành' }
+                }
+                return <Tag color={map[v]?.color || 'default'}>{map[v]?.text || v}</Tag>
+              }
+            },
+            { title: 'Chi phí', dataIndex: 'chiPhi', render: v => v ? `${Number(v).toLocaleString('vi-VN')} đ` : '—' },
+            { title: 'Ngày yêu cầu', dataIndex: 'createdAt', render: v => dayjs(v).format('DD/MM/YYYY HH:mm') }
+          ]}
+        />
+      )
+    }
+  ] : []
 
   return (
     <div>
@@ -250,9 +359,9 @@ export default function RoomsPage() {
               </Form.Item>
 
               <Typography.Title level={5} style={{ marginTop: 16, marginBottom: 8 }}>Dịch vụ gán kèm</Typography.Title>
-              <div style={{ maxHeight: 200, overflowY: 'auto', border: '1px solid #d9d9d9', borderRadius: 8, padding: '8px 12px', marginBottom: 16, background: '#fafafa' }}>
+              <div style={{ maxHeight: 250, overflowY: 'auto', border: '1px solid #d9d9d9', borderRadius: 8, padding: '8px 12px', marginBottom: 16, background: '#fafafa' }}>
                 {allServices?.map(svc => (
-                  <div key={svc.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <div key={svc.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                     <Form.Item
                       name={['services', svc.id, 'checked']}
                       valuePropName="checked"
@@ -273,19 +382,33 @@ export default function RoomsPage() {
                       {({ getFieldValue }) => {
                         const isChecked = getFieldValue(['services', svc.id, 'checked'])
                         return isChecked ? (
-                          <Form.Item
-                            name={['services', svc.id, 'donGiaOverride']}
-                            style={{ marginBottom: 0 }}
-                          >
-                            <InputNumber
-                              placeholder="Giá riêng (nếu có)"
-                              style={{ width: 160 }}
-                              min={0}
-                              addonAfter="đ"
-                              formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                              parser={(v) => v.replace(/\$\s?|(,*)/g, '')}
-                            />
-                          </Form.Item>
+                          <Space style={{ display: 'flex', gap: 8 }}>
+                            <Form.Item
+                              name={['services', svc.id, 'soLuong']}
+                              style={{ marginBottom: 0 }}
+                              initialValue={1}
+                            >
+                              <InputNumber
+                                placeholder="Số lượng"
+                                style={{ width: 90 }}
+                                min={1}
+                                addonBefore="SL"
+                              />
+                            </Form.Item>
+                            <Form.Item
+                              name={['services', svc.id, 'donGiaOverride']}
+                              style={{ marginBottom: 0 }}
+                            >
+                              <InputNumber
+                                placeholder="Giá riêng"
+                                style={{ width: 130 }}
+                                min={0}
+                                addonAfter="đ"
+                                formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={(v) => v.replace(/\$\s?|(,*)/g, '')}
+                              />
+                            </Form.Item>
+                          </Space>
                         ) : null
                       }}
                     </Form.Item>
@@ -309,6 +432,23 @@ export default function RoomsPage() {
           </Form.Item>
         </Form>
       </Modal>
+
+      <Modal
+        title="Tổng quan chi tiết phòng trọ"
+        open={detailModalOpen}
+        onCancel={() => { setDetailModalOpen(false); setDetailRoomId(null); }}
+        footer={[
+          <Button key="close" onClick={() => { setDetailModalOpen(false); setDetailRoomId(null); }}>Đóng</Button>
+        ]}
+        width={750}
+        loading={isLoadingDetail}
+        destroyOnClose
+      >
+        {roomDetail && (
+          <Tabs defaultActiveKey="roomInfo" items={detailTabs} style={{ marginTop: 16 }} />
+        )}
+      </Modal>
     </div>
   )
 }
+

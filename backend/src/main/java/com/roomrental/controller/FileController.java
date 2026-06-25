@@ -33,4 +33,11 @@ public class FileController {
                 .contentType(mediaType)
                 .body(new InputStreamResource(stream));
     }
+
+    @PostMapping("/upload")
+    public ResponseEntity<java.util.Map<String, String>> uploadFile(@RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        String fileName = fileStorageService.uploadFile(file);
+        String url = fileStorageService.getPresignedUrl(fileName);
+        return ResponseEntity.ok(java.util.Map.of("fileName", fileName, "url", url));
+    }
 }

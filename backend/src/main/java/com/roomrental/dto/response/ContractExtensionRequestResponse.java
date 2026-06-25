@@ -9,7 +9,7 @@ public record ContractExtensionRequestResponse(
     String tenPhong,
     Long tenantId,
     String hoTenTenant,
-    Integer soThangGiaHan,
+    java.time.LocalDate ngayKetThucMoi,
     String ghiChu,
     ContractExtensionRequest.TrangThai trangThai,
     LocalDateTime createdAt,

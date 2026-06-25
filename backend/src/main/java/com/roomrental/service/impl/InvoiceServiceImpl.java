@@ -59,9 +59,24 @@ public class InvoiceServiceImpl implements InvoiceService {
             utilityPrice = utilityPriceRepository.findTopByOrderByApDungTuDesc().orElse(null);
         }
 
-        BigDecimal dienDau  = nvl(req.chiSoDienDau());
+        int prevThang = req.thang() == 1 ? 12 : req.thang() - 1;
+        int prevNam = req.thang() == 1 ? req.nam() - 1 : req.nam();
+        BigDecimal dienDau = req.chiSoDienDau();
+        BigDecimal nuocDau = req.chiSoNuocDau();
+        if (dienDau == null || dienDau.compareTo(BigDecimal.ZERO) == 0 || nuocDau == null || nuocDau.compareTo(BigDecimal.ZERO) == 0) {
+            java.util.Optional<Invoice> prevInvoiceOpt = invoiceRepository.findTopByHopDongIdAndThangAndNam(contract.getId(), prevThang, prevNam);
+            if (prevInvoiceOpt.isPresent()) {
+                if (dienDau == null || dienDau.compareTo(BigDecimal.ZERO) == 0) {
+                    dienDau = prevInvoiceOpt.get().getChiSoDienCuoi();
+                }
+                if (nuocDau == null || nuocDau.compareTo(BigDecimal.ZERO) == 0) {
+                    nuocDau = prevInvoiceOpt.get().getChiSoNuocCuoi();
+                }
+            }
+        }
+        dienDau = nvl(dienDau);
         BigDecimal dienCuoi = nvl(req.chiSoDienCuoi());
-        BigDecimal nuocDau  = nvl(req.chiSoNuocDau());
+        nuocDau = nvl(nuocDau);
         BigDecimal nuocCuoi = nvl(req.chiSoNuocCuoi());
 
         BigDecimal tieuThuDien = dienCuoi.subtract(dienDau);
@@ -81,11 +96,18 @@ public class InvoiceServiceImpl implements InvoiceService {
         for (RoomService rs : services) {
             BigDecimal price = rs.getDonGiaOverride() != null ? rs.getDonGiaOverride() : rs.getService().getDonGiaMacDinh();
             String donVi = rs.getService().getDonVi();
+            int quantity = rs.getSoLuong() != null ? rs.getSoLuong() : 1;
+            BigDecimal subtotal;
             if (donVi != null && donVi.toLowerCase().contains("người")) {
-                tienDichVuThem = tienDichVuThem.add(price.multiply(BigDecimal.valueOf(contract.getSoNguoiO())));
+                if (quantity == 1 && contract.getSoNguoiO() > 1) {
+                    subtotal = price.multiply(BigDecimal.valueOf(contract.getSoNguoiO()));
+                } else {
+                    subtotal = price.multiply(BigDecimal.valueOf(quantity));
+                }
             } else {
-                tienDichVuThem = tienDichVuThem.add(price);
+                subtotal = price.multiply(BigDecimal.valueOf(quantity));
             }
+            tienDichVuThem = tienDichVuThem.add(subtotal);
         }
 
         BigDecimal tongTien = contract.getGiaThue()
@@ -118,9 +140,24 @@ public class InvoiceServiceImpl implements InvoiceService {
             throw new BadRequestException("Không thể chỉnh sửa hóa đơn đã thanh toán");
         }
 
-        BigDecimal dienDau  = nvl(req.chiSoDienDau());
+        BigDecimal dienDau = req.chiSoDienDau();
+        BigDecimal nuocDau = req.chiSoNuocDau();
+        if (dienDau == null || dienDau.compareTo(BigDecimal.ZERO) == 0 || nuocDau == null || nuocDau.compareTo(BigDecimal.ZERO) == 0) {
+            int prevThang = invoice.getThang() == 1 ? 12 : invoice.getThang() - 1;
+            int prevNam = invoice.getThang() == 1 ? invoice.getNam() - 1 : invoice.getNam();
+            java.util.Optional<Invoice> prevInvoiceOpt = invoiceRepository.findTopByHopDongIdAndThangAndNam(invoice.getHopDong().getId(), prevThang, prevNam);
+            if (prevInvoiceOpt.isPresent()) {
+                if (dienDau == null || dienDau.compareTo(BigDecimal.ZERO) == 0) {
+                    dienDau = prevInvoiceOpt.get().getChiSoDienCuoi();
+                }
+                if (nuocDau == null || nuocDau.compareTo(BigDecimal.ZERO) == 0) {
+                    nuocDau = prevInvoiceOpt.get().getChiSoNuocCuoi();
+                }
+            }
+        }
+        dienDau = nvl(dienDau);
         BigDecimal dienCuoi = nvl(req.chiSoDienCuoi());
-        BigDecimal nuocDau  = nvl(req.chiSoNuocDau());
+        nuocDau = nvl(nuocDau);
         BigDecimal nuocCuoi = nvl(req.chiSoNuocCuoi());
 
         BigDecimal tieuThuDien = dienCuoi.subtract(dienDau);
@@ -154,11 +191,18 @@ public class InvoiceServiceImpl implements InvoiceService {
         for (RoomService rs : services) {
             BigDecimal price = rs.getDonGiaOverride() != null ? rs.getDonGiaOverride() : rs.getService().getDonGiaMacDinh();
             String donVi = rs.getService().getDonVi();
+            int quantity = rs.getSoLuong() != null ? rs.getSoLuong() : 1;
+            BigDecimal subtotal;
             if (donVi != null && donVi.toLowerCase().contains("người")) {
-                tienDichVuThem = tienDichVuThem.add(price.multiply(BigDecimal.valueOf(contract.getSoNguoiO())));
+                if (quantity == 1 && contract.getSoNguoiO() > 1) {
+                    subtotal = price.multiply(BigDecimal.valueOf(contract.getSoNguoiO()));
+                } else {
+                    subtotal = price.multiply(BigDecimal.valueOf(quantity));
+                }
             } else {
-                tienDichVuThem = tienDichVuThem.add(price);
+                subtotal = price.multiply(BigDecimal.valueOf(quantity));
             }
+            tienDichVuThem = tienDichVuThem.add(subtotal);
         }
 
         BigDecimal tongTien = contract.getGiaThue()
@@ -227,11 +271,18 @@ public class InvoiceServiceImpl implements InvoiceService {
             for (RoomService rs : services) {
                 BigDecimal price = rs.getDonGiaOverride() != null ? rs.getDonGiaOverride() : rs.getService().getDonGiaMacDinh();
                 String donVi = rs.getService().getDonVi();
+                int quantity = rs.getSoLuong() != null ? rs.getSoLuong() : 1;
+                BigDecimal subtotal;
                 if (donVi != null && donVi.toLowerCase().contains("người")) {
-                    tienDichVuThem = tienDichVuThem.add(price.multiply(BigDecimal.valueOf(contract.getSoNguoiO())));
+                    if (quantity == 1 && contract.getSoNguoiO() > 1) {
+                        subtotal = price.multiply(BigDecimal.valueOf(contract.getSoNguoiO()));
+                    } else {
+                        subtotal = price.multiply(BigDecimal.valueOf(quantity));
+                    }
                 } else {
-                    tienDichVuThem = tienDichVuThem.add(price);
+                    subtotal = price.multiply(BigDecimal.valueOf(quantity));
                 }
+                tienDichVuThem = tienDichVuThem.add(subtotal);
             }
 
             BigDecimal tongTien = contract.getGiaThue().add(tienDichVuThem);
@@ -320,11 +371,16 @@ public class InvoiceServiceImpl implements InvoiceService {
         for (com.roomrental.entity.RoomService rs : roomServices) {
             BigDecimal price = rs.getDonGiaOverride() != null ? rs.getDonGiaOverride() : rs.getService().getDonGiaMacDinh();
             String donVi = rs.getService().getDonVi();
+            int quantity = rs.getSoLuong() != null ? rs.getSoLuong() : 1;
             BigDecimal subtotal;
             if (donVi != null && donVi.toLowerCase().contains("người")) {
-                subtotal = price.multiply(BigDecimal.valueOf(i.getHopDong().getSoNguoiO()));
+                if (quantity == 1 && i.getHopDong().getSoNguoiO() > 1) {
+                    subtotal = price.multiply(BigDecimal.valueOf(i.getHopDong().getSoNguoiO()));
+                } else {
+                    subtotal = price.multiply(BigDecimal.valueOf(quantity));
+                }
             } else {
-                subtotal = price;
+                subtotal = price.multiply(BigDecimal.valueOf(quantity));
             }
             chiTietDichVu.add(new InvoiceResponse.DichVuHoaDon(
                 rs.getService().getTenDichVu(),
